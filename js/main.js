@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /* Первое задание по личному проекту */
 
@@ -23,12 +23,12 @@ var getRandomArrElem = function (arr) {
 };
 
 /* Функция перетасовки массива */
-var getShuffledArr = function(arr) {
-  arr.sort(function() {
+var getShuffledArr = function (arr) {
+  arr.sort (function() {
     return 0.5 - Math.random();
   });
   return arr;
-}
+};
 
 /* Функция, которая генерирует объект с объявлением */
 var generatePost = function (number) {
@@ -55,7 +55,7 @@ var generatePost = function (number) {
       "x": getRandomInt(0, map.offsetWidth),
       "y": getRandomInt(130, 630)
     }
-  }
+  };
   return post;
 };
 
@@ -71,7 +71,7 @@ var generateData = function () {
 };
 
 /* Переключает карту в активное состояние, отрисовывает метки на основе случайных  */
-var generateMap = function() {
+var generateMap = function () {
   map.classList.remove("map--faded");
 
   var pinMap = document.querySelector(".map__pins");
@@ -82,7 +82,7 @@ var generateMap = function() {
 
   for (var i = 0; i < data.length; i++) {
     var pinElement = defaultPin.cloneNode(true);
-    pinElement.setAttribute("style", "left:" + (data[i].location.x - pinElement.offsetWidth / 2) +"px; top:" + (data[i].location.y - pinElement.offsetHeight) + "px");
+    pinElement.setAttribute("style", "left:" + (data[i].location.x - pinElement.offsetWidth / 2) + "px; top:" + (data[i].location.y - pinElement.offsetHeight) + "px");
     pinElement.querySelector("img").setAttribute("src", data[i].author.avatar);
     pinElement.querySelector("img").setAttribute("alt", data[i].offer.title);
 
@@ -90,6 +90,6 @@ var generateMap = function() {
   }
 
   pinMap.appendChild(fragment);
-}
+};
 
 generateMap();
