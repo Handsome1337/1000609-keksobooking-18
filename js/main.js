@@ -8,9 +8,12 @@ var TYPES = ['palace', 'flat', 'house', 'bungalo'];
 var TIMES = ['12:00', '13:00', '14:00'];
 var OPTIONS = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 var PICTURES = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
+var PINHEIGHT = 70;
+var PINWIDTH = 50;
 
 var map = document.querySelector('.map');
-
+var pinMap = document.querySelector('.map__pins');
+var defaultPin = document.querySelector('#pin').content.querySelector('.map__pin');
 /* Функция генерации случайного числа */
 var getRandomInt = function (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -18,16 +21,16 @@ var getRandomInt = function (min, max) {
 
 /* Функция выбора случайного элемента массива */
 var getRandomArrElem = function (arr) {
-  var rand = Math.floor(Math.random() * arr.length);
+  var rand = getRandomInt(0, arr.length - 1);
   return arr[rand];
 };
 
 /* Функция перетасовки массива */
 var getShuffledArr = function (arr) {
-  arr.sort(function () {
+  var shuffledArr = arr.slice().sort(function () {
     return 0.5 - Math.random();
   });
-  return arr;
+  return shuffledArr;
 };
 
 /* Функция, которая генерирует объект с объявлением */
@@ -70,26 +73,32 @@ var generateData = function () {
   return data;
 };
 
-/* Переключает карту в активное состояние, отрисовывает метки на основе случайных  */
-var generateMap = function () {
+/* Переключает карту в активное состояние */
+var activateMap = function () {
   map.classList.remove('map--faded');
+};
 
-  var pinMap = document.querySelector('.map__pins');
-  var defaultPin = document.querySelector('#pin').content.querySelector('.map__pin');
+/* Сооздает метку случайного объявления */
+var createPin = function (obj) {
+  var pinElement = defaultPin.cloneNode(true);
+  pinElement.style.left = obj.location.x - PINWIDTH / 2 + 'px';
+  pinElement.style.top = obj.location.y - PINHEIGHT + 'px'; // мне кажется, в ТЗ ошибка и вычитать высоту метки не надо
+  pinElement.querySelector('img').setAttribute('src', obj.author.avatar);
+  pinElement.querySelector('img').setAttribute('alt', obj.offer.title);
+  return pinElement;
+};
+
+/* Отрисовывает метки на основе случайных объявлений */
+var fillMap = function (arr) {
   var fragment = document.createDocumentFragment();
 
-  var data = generateData();
-
-  for (var i = 0; i < data.length; i++) {
-    var pinElement = defaultPin.cloneNode(true);
-    pinElement.setAttribute('style', 'left:' + (data[i].location.x - pinElement.offsetWidth / 2) + 'px; top:' + (data[i].location.y - pinElement.offsetHeight) + 'px');
-    pinElement.querySelector('img').setAttribute('src', data[i].author.avatar);
-    pinElement.querySelector('img').setAttribute('alt', data[i].offer.title);
-
+  for (var i = 0; i < arr.length; i++) {
+    var pinElement = createPin(arr[i]);
     fragment.appendChild(pinElement);
   }
 
   pinMap.appendChild(fragment);
 };
 
-generateMap();
+activateMap();
+fillMap(generateData());
