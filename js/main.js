@@ -112,6 +112,23 @@ fillMap(data);
 Второе задание по личному проекту
 */
 
+/* Создает новый элемент с заданным атрибутом class */
+var createElem = function (elemName, elemClass) {
+  var newElement = document.createElement(elemName);
+  newElement.className = elemClass;
+  return newElement;
+};
+
+/* Создает новый элемент img с заданными атрибутоми src, width, height, alt и class */
+var createImg = function (src, width, height, alt, elemClass) {
+  var newImg = createElem('img', elemClass);
+  newImg.src = src;
+  newImg.width = width;
+  newImg.height = height;
+  newImg.alt = alt;
+  return newImg;
+};
+
 /* Переименовывает тип жилья в соответствии с ТЗ */
 var translateType = function (type) {
   switch (type) {
@@ -133,12 +150,7 @@ var createAlbum = function (arr) {
   var fragment = document.createDocumentFragment();
 
   for (var i = 0; i < arr.length; i++) {
-    var photo = document.createElement('img');
-    photo.className = 'popup__photo';
-    photo.setAttribute('src', arr[i]);
-    photo.setAttribute('width', 45);
-    photo.setAttribute('height', 40);
-    photo.setAttribute('alt', 'Фотография жилья');
+    var photo = createImg(arr[i], 45, 40, 'Фотография жилья', 'popup__photo');
     fragment.appendChild(photo);
   }
 
@@ -150,8 +162,7 @@ var createFeautures = function (arr) {
   var fragment = document.createDocumentFragment();
 
   for (var i = 0; i < arr.length; i++) {
-    var feauture = document.createElement('li');
-    feauture.className = 'popup__feature popup__feature--' + arr[i];
+    var feauture = createElem('li', 'popup__feature popup__feature--' + arr[i]);
     fragment.appendChild(feauture);
   }
 
