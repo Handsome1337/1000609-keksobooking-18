@@ -1,6 +1,8 @@
 'use strict';
 
-/* Первое задание по личному проекту */
+/*
+Первое задание по личному проекту
+*/
 
 /* Тестовые данные */
 var TITLES = ['Квартира 1', 'Квартира 2', 'Квартира 3', 'Дворец 1', 'Дом 1', 'Дом 2', 'Дом 3', 'Бунгало 1'];
@@ -14,6 +16,7 @@ var PINWIDTH = 50;
 var map = document.querySelector('.map');
 var pinMap = document.querySelector('.map__pins');
 var defaultPin = document.querySelector('#pin').content.querySelector('.map__pin');
+
 /* Функция генерации случайного числа */
 var getRandomInt = function (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -73,12 +76,14 @@ var generateData = function () {
   return data;
 };
 
+var data = generateData();
+
 /* Переключает карту в активное состояние */
 var activateMap = function () {
   map.classList.remove('map--faded');
 };
 
-/* Сооздает метку случайного объявления */
+/* Сооздаёт метку случайного объявления */
 var createPin = function (obj) {
   var pinElement = defaultPin.cloneNode(true);
   pinElement.style.left = obj.location.x - PINWIDTH / 2 + 'px';
@@ -101,4 +106,98 @@ var fillMap = function (arr) {
 };
 
 activateMap();
-fillMap(generateData());
+fillMap(data);
+
+/*
+Второе задание по личному проекту
+*/
+
+/* Создает новый элемент с заданным атрибутом class */
+var createElem = function (elemName, elemClass) {
+  var newElement = document.createElement(elemName);
+  newElement.className = elemClass;
+  return newElement;
+};
+
+/* Создает новый элемент img с заданными атрибутоми src, width, height, alt и class */
+var createImg = function (src, width, height, alt, elemClass) {
+  var newImg = createElem('img', elemClass);
+  newImg.src = src;
+  newImg.width = width;
+  newImg.height = height;
+  newImg.alt = alt;
+  return newImg;
+};
+
+/* Переименовывает тип жилья в соответствии с ТЗ */
+var translateType = function (type) {
+  switch (type) {
+    case 'palace':
+      return 'Дворец';
+    case 'flat':
+      return 'Квартира';
+    case 'house':
+      return 'Дом';
+    case 'bungalo':
+      return 'Бунгало';
+    default:
+      return type;
+  }
+};
+
+/* Создаёт коллекцию фотографий жилья */
+var createAlbum = function (arr) {
+  var fragment = document.createDocumentFragment();
+
+  for (var i = 0; i < arr.length; i++) {
+    var photo = createImg(arr[i], 45, 40, 'Фотография жилья', 'popup__photo');
+    fragment.appendChild(photo);
+  }
+
+  return fragment;
+};
+
+/* Создаёт коллекцию опций */
+var createFeautures = function (arr) {
+  var fragment = document.createDocumentFragment();
+
+  for (var i = 0; i < arr.length; i++) {
+    var feauture = createElem('li', 'popup__feature popup__feature--' + arr[i]);
+    fragment.appendChild(feauture);
+  }
+
+  return fragment;
+};
+
+/* Заполняет данные карточки объявления */
+var fillCard = function (obj) {
+  var defaultCard = document.querySelector('#card').content.querySelector('.map__card');
+  var postCard = defaultCard.cloneNode(true);
+  /* Находит блок для фотографий */
+  var album = postCard.querySelector('.popup__photos');
+  /* Очищает содержимое блока для фотографий */
+  album.textContent = '';
+  /* Находит блок для списка опций */
+  var feauturesList = postCard.querySelector('.popup__features');
+  /* Очищает содержимое блока для списка опций */
+  feauturesList.textContent = '';
+
+  postCard.querySelector('.popup__title').textContent = obj.offer.title;
+  postCard.querySelector('.popup__text--address').textContent = obj.offer.address;
+  postCard.querySelector('.popup__text--price').textContent = obj.offer.price + '₽/ночь';
+  postCard.querySelector('.popup__type').textContent = translateType(obj.offer.type);
+  postCard.querySelector('.popup__text--capacity').textContent = obj.offer.rooms + ' комнаты для ' + obj.offer.guests + ' гостей';
+  postCard.querySelector('.popup__text--time').textContent = 'Заезд после ' + obj.offer.checkin + ', выезд до ' + obj.offer.checkout;
+  feauturesList.appendChild(createFeautures(obj.offer.feautures));
+  postCard.querySelector('.popup__description').textContent = obj.offer.description;
+  album.appendChild(createAlbum(obj.offer.photos));
+  postCard.querySelector('.popup__avatar').setAttribute('src', obj.author.avatar);
+  return postCard;
+};
+
+/* Отрисовывает карточку объявления */
+var createCard = function (obj) {
+  pinMap.parentNode.insertBefore(fillCard(obj), pinMap.nextSibling);
+};
+
+createCard(data[0]);
