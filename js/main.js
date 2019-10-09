@@ -14,7 +14,7 @@ var PINHEIGHT = 70;
 var PINWIDTH = 50;
 
 var map = document.querySelector('.map');
-var pinMap = document.querySelector('.map__pins');
+var pinMap = map.querySelector('.map__pins');
 var defaultPin = document.querySelector('#pin').content.querySelector('.map__pin');
 
 /* Функция генерации случайного числа */
@@ -104,9 +104,6 @@ var fillMap = function (arr) {
 
   pinMap.appendChild(fragment);
 };
-
-activateMap();
-fillMap(data);
 
 /*
 Второе задание по личному проекту
@@ -200,4 +197,83 @@ var createCard = function (obj) {
   pinMap.parentNode.insertBefore(fillCard(obj), pinMap.nextSibling);
 };
 
-createCard(data[0]);
+/*
+Третье задание по личному проекту
+*/
+
+var ENTER_KEYCODE = 13;
+
+/* Находит главную метку, взаимодействие с которой переводит страницу в активное состояние */
+var mainPin = map.querySelector('.map__pin--main');
+var mainPinWidth = mainPin.offsetWidth;
+var mainPinHeight = mainPin.offsetHeight;
+/* Находит все элементы, которые недопустны в неактивном состоянии */
+var disabledElements = document.querySelectorAll('[disabled]');
+
+/* Находит координаты главный метки */
+var getMainPinPosition = function () {
+  var x = mainPin.offsetLeft;
+  var y = mainPin.offsetTop;
+  return [x, y];
+};
+
+/* Заполняет поле адреса координатами метки */
+var fillAddressInput = function () {
+  /* Находит поле адреса */
+  var addressInput = document.querySelector('#address');
+  addressInput.value = Math.round((getMainPinPosition()[0] + mainPinWidth / 2)) + ', ' + Math.round((getMainPinPosition()[1] + mainPinHeight / 2));
+};
+
+/* Удаляет атрибут disabled у переданной в параметр коллекции элементов */
+var removeDisabledAttr = function (arr) {
+  for (var i = 0; i < arr.length; i++) {
+    arr[i].removeAttribute('disabled');
+  }
+};
+
+/* Обработчик делает недопустные элементы доступными при нажатии мышкой на главную метку */
+mainPin.addEventListener('mousedown', function () {
+  activateMap();
+  fillMap(data);
+  createCard(data[0]);
+  removeDisabledAttr(disabledElements);
+});
+
+/* Обработчик делает недопустные элементы доступными при нажатии на кнопку Enter, если фокус установлен на главной метке */
+mainPin.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    activateMap();
+    fillMap(data);
+    createCard(data[0]);
+    removeDisabledAttr(disabledElements);
+  }
+});
+
+var matchRoomsAndGuests = function () {
+  var numberOfRooms = parseInt(document.querySelector('#room_number').value, 10);
+  var numberOfGuests = parseInt(document.querySelector('#capacity').value, 10);
+  var mismatch = '';
+  if (numberOfRooms === 1 && numberOfGuests !== 1) {
+    mismatch = '1 комната — для 1 гостя';
+  } else if (numberOfRooms === 2 && (numberOfGuests !== 1 && numberOfGuests !== 2)) {
+    mismatch = '2 комнаты — для 2 гостей или для 1 гостя';
+  } else if (numberOfRooms === 3 && numberOfGuests === 0) {
+    mismatch = '3 комнаты — для 3 гостей, для 2 гостей или для 1 гостя';
+  } else if (numberOfRooms === 100 && numberOfGuests !== 0) {
+    mismatch = '100 комнат — не для гостей';
+  }
+  return mismatch;
+};
+
+var postForm = document.querySelector('.ad-form__submit');
+
+postForm.addEventListener('click', function (evt) {
+  var target = evt.target;
+  var message = matchRoomsAndGuests();
+
+  if (message) {
+    target.setCustomValidity(message);
+  }
+});
+
+fillAddressInput();
