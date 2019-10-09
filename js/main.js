@@ -207,8 +207,14 @@ var ENTER_KEYCODE = 13;
 var mainPin = map.querySelector('.map__pin--main');
 var mainPinWidth = mainPin.offsetWidth;
 var mainPinHeight = mainPin.offsetHeight;
-/* Находит все элементы, которые недопустны в неактивном состоянии */
-var disabledElements = document.querySelectorAll('[disabled]');
+/* Находит форму объявления и кнопку отправки формы */
+var form = document.querySelector('.ad-form');
+var formSubmit = form.querySelector('.ad-form__submit');
+
+/* Переключает форму в активное состояние */
+var activateForm = function () {
+  form.classList.remove('ad-form--disabled');
+};
 
 /* Находит координаты главный метки */
 var getMainPinPosition = function () {
@@ -225,30 +231,15 @@ var fillAddressInput = function () {
 };
 
 /* Удаляет атрибут disabled у переданной в параметр коллекции элементов */
-var removeDisabledAttr = function (arr) {
-  for (var i = 0; i < arr.length; i++) {
-    arr[i].removeAttribute('disabled');
+var removeDisabledAttr = function () {
+  /* Находит все элементы, которые недопустны в неактивном состоянии */
+  var disabledElements = document.querySelectorAll('[disabled]');
+  for (var i = 0; i < disabledElements.length; i++) {
+    disabledElements[i].removeAttribute('disabled');
   }
 };
 
-/* Обработчик делает недопустные элементы доступными при нажатии мышкой на главную метку */
-mainPin.addEventListener('mousedown', function () {
-  activateMap();
-  fillMap(data);
-  createCard(data[0]);
-  removeDisabledAttr(disabledElements);
-});
-
-/* Обработчик делает недопустные элементы доступными при нажатии на кнопку Enter, если фокус установлен на главной метке */
-mainPin.addEventListener('keydown', function (evt) {
-  if (evt.keyCode === ENTER_KEYCODE) {
-    activateMap();
-    fillMap(data);
-    createCard(data[0]);
-    removeDisabledAttr(disabledElements);
-  }
-});
-
+/* Сопоставляет количество комнат с количеством гостей */
 var matchRoomsAndGuests = function () {
   var numberOfRooms = parseInt(document.querySelector('#room_number').value, 10);
   var numberOfGuests = parseInt(document.querySelector('#capacity').value, 10);
@@ -265,15 +256,33 @@ var matchRoomsAndGuests = function () {
   return mismatch;
 };
 
-var postForm = document.querySelector('.ad-form__submit');
+/* Обработчик делает недопустные элементы доступными при нажатии мышкой на главную метку */
+mainPin.addEventListener('mousedown', function () {
+  activateMap();
+  fillMap(data);
+  createCard(data[0]);
+  activateForm();
+  removeDisabledAttr();
+});
 
-postForm.addEventListener('click', function (evt) {
-  var target = evt.target;
-  var message = matchRoomsAndGuests();
-
-  if (message) {
-    target.setCustomValidity(message);
+/* Обработчик делает недопустные элементы доступными при нажатии на кнопку Enter, если фокус установлен на главной метке */
+mainPin.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    activateMap();
+    fillMap(data);
+    createCard(data[0]);
+    activateForm();
+    removeDisabledAttr();
   }
+});
+
+/* Обработчик не отправляет форму, если количество комнат не совпадает с доступным количеством гостей */
+formSubmit.addEventListener('click', function () {
+  var numberOfGuests = document.querySelector('#capacity');
+  numberOfGuests.setCustomValidity(matchRoomsAndGuests());
+  /* Передаем сообщение об ошибке только в select с выбором количества гостей, так как скорее всего у пользователя
+  один объект недвижимости с фиксированным количеством комнат, а не много объектов, поэтому количество комнат с
+  высокой вероятностью не изменится, изменится количество гостей */
 });
 
 fillAddressInput();
