@@ -267,21 +267,22 @@ var matchRoomsAndGuests = function () {
   return mismatch;
 };
 
-/* Обработчик делает недопустные элементы доступными при нажатии мышкой на главную метку */
-mainPin.addEventListener('mousedown', function () {
+var activatePage = function () {
   activateMap();
   fillMap(data);
   createCard(data[0]);
   activateForm();
+};
+
+/* Обработчик делает недопустные элементы доступными при нажатии мышкой на главную метку */
+mainPin.addEventListener('mousedown', function () {
+  activatePage();
 });
 
-/* Обработчик делает недопустные элементы доступными при нажатии на кнопку Enter, если фокус установлен на главной метке */
+/* Обработчик делает недоступные элементы доступными при нажатии на кнопку Enter, если фокус установлен на главной метке */
 mainPin.addEventListener('keydown', function (evt) {
   if (evt.keyCode === ENTER_KEYCODE) {
-    activateMap();
-    fillMap(data);
-    createCard(data[0]);
-    activateForm();
+    activatePage();
   }
 });
 
