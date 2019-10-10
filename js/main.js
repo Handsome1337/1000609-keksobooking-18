@@ -104,25 +104,27 @@ var fillMap = function (arr) {
     Часть четвёртого задания
     */
     pinElement.addEventListener('click', function () {
-      var card = map.querySelector('.map__card'); // ищем карточку объявления
-      var activePin = map.querySelector('.map__pin--active'); // ищем активную метку
-      if (activePin) { // если активная метка есть
-        activePin.classList.remove('map__pin--active'); // убираем класс --active у метки, на которую пользователь нажал ранее
+      /* Находит карточку объявления */
+      var card = map.querySelector('.map__card');
+      /* Находит активную метку */
+      var activePin = map.querySelector('.map__pin--active');
+      /* Деактивирует метку, которую ранее активировал пользователь, если такая была */
+      if (activePin) {
+        activePin.classList.remove('map__pin--active');
       }
-      pinElement.classList.add('map__pin--active'); // добавляем класс --active метке, на которую пользователь нажал в данном событии
-      if (card) { // если карточка объявляется существовала, то удаляем её
+      /* Активирует метку */
+      pinElement.classList.add('map__pin--active');
+      /* Если ранее была открыта какая-либо карточка, удаляет её */
+      if (card) {
         card.remove();
       }
-      card = createCard(item); // создаем карточку объявления
-      addCard(item);
-      var cardClose = card.querySelector('.popup__close'); // ищем кнопку закрытия карточки
-
-      console.log(cardClose);
-      var say = function () {
-        console.log('wtf');
-      };
-      cardClose.addEventListener('click', say);
-      document.addEventListener('keydown', onCardEscPress); // закрываем карточку
+      card = createCard(item);
+      addCard(card);
+      /* Ищет кнопку закрытия карточки */
+      var cardClose = card.querySelector('.popup__close');
+      /* Закрывает карточку */
+      cardClose.addEventListener('click', onCardCloseClick);
+      document.addEventListener('keydown', onCardEscPress);
     });
     /*
     Часть четвёртого задания
@@ -222,8 +224,8 @@ var createCard = function (obj) {
 };
 
 /* Отрисовывает карточку объявления */
-var addCard = function (obj) {
-  pinMap.parentNode.insertBefore(createCard(obj), pinMap.nextSibling);
+var addCard = function (card) {
+  pinMap.parentNode.insertBefore(card, pinMap.nextSibling);
 };
 
 /*
