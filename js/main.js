@@ -14,7 +14,7 @@ var PINHEIGHT = 70;
 var PINWIDTH = 50;
 
 var map = document.querySelector('.map');
-var pinMap = document.querySelector('.map__pins');
+var pinMap = map.querySelector('.map__pins');
 var defaultPin = document.querySelector('#pin').content.querySelector('.map__pin');
 
 /* Функция генерации случайного числа */
@@ -104,9 +104,6 @@ var fillMap = function (arr) {
 
   pinMap.appendChild(fragment);
 };
-
-activateMap();
-fillMap(data);
 
 /*
 Второе задание по личному проекту
@@ -200,4 +197,101 @@ var createCard = function (obj) {
   pinMap.parentNode.insertBefore(fillCard(obj), pinMap.nextSibling);
 };
 
-createCard(data[0]);
+/*
+Третье задание по личному проекту
+*/
+
+var ENTER_KEYCODE = 13;
+var MAIN_PIN_WIDTH = 62;
+var MAIN_PIN_HEIGHT = 62;
+var TAIL_OF_MAIN_PIN_HEIGHT = 22;
+
+/* Находит главную метку, взаимодействие с которой переводит страницу в активное состояние */
+var mainPin = map.querySelector('.map__pin--main');
+/* Находит форму объявления и кнопку отправки формы */
+var form = document.querySelector('.ad-form');
+var formSubmit = form.querySelector('.ad-form__submit');
+/* Находит все элементы формы, которые недопустны в неактивном состоянии */
+var formDisabledElements = form.querySelectorAll('[disabled]');
+/* Находит select с выбором количества комнат и select с выбором количества гостей */
+var numberOfRoomsSelect = document.querySelector('#room_number');
+var numberOfGuestsSelect = document.querySelector('#capacity');
+/* Находит input для ввода адреса */
+var addressInput = document.querySelector('#address');
+
+/* Переключает форму в активное состояние */
+var activateForm = function () {
+  form.classList.remove('ad-form--disabled');
+  removeDisabledAttr(formDisabledElements);
+  fillAddressInput(getMainPinPosition());
+};
+
+/* Находит координаты главный метки */
+var getMainPinPosition = function () {
+  var coordinates = {
+    'x': Math.round(mainPin.offsetLeft + MAIN_PIN_WIDTH / 2),
+    'y': Math.round(mainPin.offsetTop + MAIN_PIN_HEIGHT / 2)
+  };
+  if (!map.classList.contains('map--faded')) {
+    coordinates.y = coordinates.y + TAIL_OF_MAIN_PIN_HEIGHT;
+  }
+  return coordinates;
+};
+
+/* Заполняет поле адреса координатами метки */
+var fillAddressInput = function (obj) {
+  addressInput.value = obj.x + ', ' + obj.y;
+};
+
+/* Удаляет атрибут disabled у переданной в параметр коллекции элементов */
+var removeDisabledAttr = function (arr) {
+  for (var i = 0; i < arr.length; i++) {
+    arr[i].disabled = false;
+  }
+};
+
+/* Сопоставляет количество комнат с количеством гостей */
+var matchRoomsAndGuests = function () {
+  var numberOfRooms = parseInt(numberOfRoomsSelect.value, 10);
+  var numberOfGuests = parseInt(numberOfGuestsSelect.value, 10);
+  var mismatch = '';
+  if (numberOfRooms === 1 && numberOfGuests !== 1) {
+    mismatch = '1 комната — для 1 гостя';
+  } else if (numberOfRooms === 2 && (numberOfGuests !== 1 && numberOfGuests !== 2)) {
+    mismatch = '2 комнаты — для 2 гостей или для 1 гостя';
+  } else if (numberOfRooms === 3 && numberOfGuests === 0) {
+    mismatch = '3 комнаты — для 3 гостей, для 2 гостей или для 1 гостя';
+  } else if (numberOfRooms === 100 && numberOfGuests !== 0) {
+    mismatch = '100 комнат — не для гостей';
+  }
+  return mismatch;
+};
+
+var activatePage = function () {
+  activateMap();
+  fillMap(data);
+  createCard(data[0]);
+  activateForm();
+};
+
+/* Обработчик делает недопустные элементы доступными при нажатии мышкой на главную метку */
+mainPin.addEventListener('mousedown', function () {
+  activatePage();
+});
+
+/* Обработчик делает недоступные элементы доступными при нажатии на кнопку Enter, если фокус установлен на главной метке */
+mainPin.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    activatePage();
+  }
+});
+
+/* Обработчик не отправляет форму, если количество комнат не совпадает с доступным количеством гостей */
+formSubmit.addEventListener('click', function () {
+  numberOfGuestsSelect.setCustomValidity(matchRoomsAndGuests());
+  /* Передаём сообщение об ошибке только в select с выбором количества гостей, так как скорее всего у пользователя
+  один объект недвижимости с фиксированным количеством комнат, а не много объектов, поэтому количество комнат с
+  высокой вероятностью не изменится, изменится количество гостей */
+});
+
+fillAddressInput(getMainPinPosition());
