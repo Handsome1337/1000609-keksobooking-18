@@ -97,10 +97,39 @@ var createPin = function (obj) {
 var fillMap = function (arr) {
   var fragment = document.createDocumentFragment();
 
-  for (var i = 0; i < arr.length; i++) {
-    var pinElement = createPin(arr[i]);
+  arr.forEach(function (item) {
+    var pinElement = createPin(item);
+
+    /*
+    Часть четвёртого задания
+    */
+    pinElement.addEventListener('click', function () {
+      var card = map.querySelector('.map__card'); // ищем карточку объявления
+      var activePin = map.querySelector('.map__pin--active'); // ищем активную метку
+      if (activePin) { // если активная метка есть
+        activePin.classList.remove('map__pin--active'); // убираем класс --active у метки, на которую пользователь нажал ранее
+      }
+      pinElement.classList.add('map__pin--active'); // добавляем класс --active метке, на которую пользователь нажал в данном событии
+      if (card) { // если карточка объявляется существовала, то удаляем её
+        card.remove();
+      }
+      card = createCard(item); // создаем карточку объявления
+      addCard(item);
+      var cardClose = card.querySelector('.popup__close'); // ищем кнопку закрытия карточки
+
+      console.log(cardClose);
+      var say = function () {
+        console.log('wtf');
+      };
+      cardClose.addEventListener('click', say);
+      document.addEventListener('keydown', onCardEscPress); // закрываем карточку
+    });
+    /*
+    Часть четвёртого задания
+    */
+
     fragment.appendChild(pinElement);
-  }
+  });
 
   pinMap.appendChild(fragment);
 };
@@ -167,7 +196,7 @@ var createFeautures = function (arr) {
 };
 
 /* Заполняет данные карточки объявления */
-var fillCard = function (obj) {
+var createCard = function (obj) {
   var defaultCard = document.querySelector('#card').content.querySelector('.map__card');
   var postCard = defaultCard.cloneNode(true);
   /* Находит блок для фотографий */
@@ -193,8 +222,8 @@ var fillCard = function (obj) {
 };
 
 /* Отрисовывает карточку объявления */
-var createCard = function (obj) {
-  pinMap.parentNode.insertBefore(fillCard(obj), pinMap.nextSibling);
+var addCard = function (obj) {
+  pinMap.parentNode.insertBefore(createCard(obj), pinMap.nextSibling);
 };
 
 /*
@@ -267,11 +296,13 @@ var matchRoomsAndGuests = function () {
   return mismatch;
 };
 
+/* Переводит страницу в активное состояние */
 var activatePage = function () {
-  activateMap();
-  fillMap(data);
-  createCard(data[0]);
-  activateForm();
+  if (map.classList.contains('map--faded')) {
+    activateMap();
+    fillMap(data);
+    activateForm();
+  }
 };
 
 /* Обработчик делает недопустные элементы доступными при нажатии мышкой на главную метку */
@@ -295,3 +326,95 @@ formSubmit.addEventListener('click', function () {
 });
 
 fillAddressInput(getMainPinPosition());
+
+/*
+Четвёртое задание по личному проекту
+*/
+
+var ESC_KEYCODE = 27;
+
+var inputTitle = form.querySelector('#title');
+var inputPrice = form.querySelector('#price');
+var typeOfHouseSelect = form.querySelector('#type');
+var timeInSelect = form.querySelector('#timein');
+var timeOutSelect = form.querySelector('#timeout');
+
+/* Сопоставляет минимальную цену за ночь с типом жилья */
+var matchTypesAndPrice = function () {
+  var typeOfHouse = typeOfHouseSelect.value;
+  var minPrice = '0';
+  if (typeOfHouse === 'flat') {
+    minPrice = '1000';
+  } else if (typeOfHouse === 'house') {
+    minPrice = '5000';
+  } else if (typeOfHouse === 'palace') {
+    minPrice = '10000';
+  }
+  return minPrice;
+};
+
+/* Изменяет цену за ночь в атрибутах placeholder и min в соответствии с типом жилья */
+var changePrice = function () {
+  var minPrice = matchTypesAndPrice();
+  inputPrice.placeholder = minPrice;
+  inputPrice.min = minPrice;
+};
+
+/* Изменяет время заезда и выезда */
+var matchTimes = function (evt) {
+  if (evt.target === timeInSelect) {
+    timeOutSelect.value = timeInSelect.value;
+  } else {
+    timeInSelect.value = timeOutSelect.value;
+  }
+};
+
+/* Находит карточку и удаляет её. Изначально открытых карточек нет, поэтому переменную card невозможно вынести в глобальную область видимости */
+var removeCard = function () {
+  var card = map.querySelector('.map__card');
+  card.remove();
+  document.removeEventListener('keydown', onCardEscPress);
+};
+
+/* Удаляет карточку при нажатии на клавишу ESC */
+var onCardEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    removeCard();
+  }
+};
+
+/* Удаляет карточку при нажатии на кнопку закрытия карточки */
+var onCardCloseClick = function () {
+  removeCard();
+};
+
+/* Проверяет валидность поля с заголовком объявления */
+inputTitle.addEventListener('invalid', function () {
+  if (inputTitle.validity.valueMissing) {
+    inputTitle.setCustomValidity('Обязательное поле. Минимальная длина — 30 символов, максимальная — 100');
+  } else if (inputTitle.validity.patternMismatch) {
+    inputTitle.setCustomValidity('Минимальная длина — 30 символов, максимальная — 100');
+  } else {
+    inputTitle.setCustomValidity('');
+  }
+});
+
+/* Проверяет валидность поля с ценой за ночь */
+inputPrice.addEventListener('invalid', function () {
+  if (inputPrice.validity.valueMissing) {
+    inputPrice.setCustomValidity('Обязательное поле. Максимальное значение — 1 000 000');
+  } else if (inputPrice.validity.rangeUnderflow) {
+    inputPrice.setCustomValidity('Минимальная цена — ' + inputPrice.min);
+  } else if (inputPrice.validity.rangeOverflow) {
+    inputPrice.setCustomValidity('Максимальная цена — 1 000 000');
+  } else {
+    inputPrice.setCustomValidity('');
+  }
+});
+
+/* По умолчанию в html у нас выбран тип жилья - квартира, а атрибут placeholder минимальной цены - 5000.
+Это не соответствует ТЗ, поэтому при загрузке страницы необходимо выполнить функцию changePrice */
+document.addEventListener('DOMContentLoaded', changePrice);
+typeOfHouseSelect.addEventListener('change', changePrice);
+timeInSelect.addEventListener('change', matchTimes);
+timeOutSelect.addEventListener('change', matchTimes);
