@@ -97,10 +97,35 @@ var createPin = function (obj) {
 var fillMap = function (arr) {
   var fragment = document.createDocumentFragment();
 
-  for (var i = 0; i < arr.length; i++) {
-    var pinElement = createPin(arr[i]);
+  arr.forEach(function (item) {
+    var pinElement = createPin(item);
+
+    /*
+    Часть четвёртого задания
+    */
+    pinElement.addEventListener('click', function () {
+      /* Находит карточку объявления */
+      var card = map.querySelector('.map__card');
+      /* Находит активную метку */
+      var activePin = map.querySelector('.map__pin--active');
+      /* Деактивирует метку, которую ранее активировал пользователь, если такая была */
+      if (activePin) {
+        activePin.classList.remove('map__pin--active');
+      }
+      /* Активирует метку */
+      pinElement.classList.add('map__pin--active');
+      /* Если ранее была открыта какая-либо карточка, удаляет её */
+      if (card) {
+        card.remove();
+      }
+      card = addCard(createCard(item));
+    });
+    /*
+    Часть четвёртого задания
+    */
+
     fragment.appendChild(pinElement);
-  }
+  });
 
   pinMap.appendChild(fragment);
 };
@@ -167,9 +192,11 @@ var createFeautures = function (arr) {
 };
 
 /* Заполняет данные карточки объявления */
-var fillCard = function (obj) {
+var createCard = function (obj) {
   var defaultCard = document.querySelector('#card').content.querySelector('.map__card');
   var postCard = defaultCard.cloneNode(true);
+  /* Ищет кнопку закрытия карточки */
+  var cardClose = postCard.querySelector('.popup__close');
   /* Находит блок для фотографий */
   var album = postCard.querySelector('.popup__photos');
   /* Очищает содержимое блока для фотографий */
@@ -189,12 +216,16 @@ var fillCard = function (obj) {
   postCard.querySelector('.popup__description').textContent = obj.offer.description;
   album.appendChild(createAlbum(obj.offer.photos));
   postCard.querySelector('.popup__avatar').setAttribute('src', obj.author.avatar);
+
+  /* Закрывает карточку */
+  cardClose.addEventListener('click', onCardCloseClick);
   return postCard;
 };
 
 /* Отрисовывает карточку объявления */
-var createCard = function (obj) {
-  pinMap.parentNode.insertBefore(fillCard(obj), pinMap.nextSibling);
+var addCard = function (card) {
+  document.addEventListener('keydown', onCardEscPress);
+  return pinMap.parentNode.insertBefore(card, pinMap.nextSibling);
 };
 
 /*
@@ -267,11 +298,13 @@ var matchRoomsAndGuests = function () {
   return mismatch;
 };
 
+/* Переводит страницу в активное состояние */
 var activatePage = function () {
-  activateMap();
-  fillMap(data);
-  createCard(data[0]);
-  activateForm();
+  if (map.classList.contains('map--faded')) {
+    activateMap();
+    fillMap(data);
+    activateForm();
+  }
 };
 
 /* Обработчик делает недопустные элементы доступными при нажатии мышкой на главную метку */
@@ -295,3 +328,79 @@ formSubmit.addEventListener('click', function () {
 });
 
 fillAddressInput(getMainPinPosition());
+
+/*
+Четвёртое задание по личному проекту
+*/
+
+var ESC_KEYCODE = 27;
+
+var inputTitle = form.querySelector('#title');
+var inputPrice = form.querySelector('#price');
+var typeOfHouseSelect = form.querySelector('#type');
+var timeInSelect = form.querySelector('#timein');
+var timeOutSelect = form.querySelector('#timeout');
+
+/* Сопоставляет минимальную цену за ночь с типом жилья */
+var matchTypesAndPrice = function () {
+  var typeOfHouse = typeOfHouseSelect.value;
+  var minPrice = '0';
+  if (typeOfHouse === 'flat') {
+    minPrice = '1000';
+  } else if (typeOfHouse === 'house') {
+    minPrice = '5000';
+  } else if (typeOfHouse === 'palace') {
+    minPrice = '10000';
+  }
+  return minPrice;
+};
+
+/* Находит карточку и удаляет её. Изначально открытых карточек нет, поэтому переменную card невозможно вынести в глобальную область видимости */
+var removeCard = function () {
+  var card = map.querySelector('.map__card');
+  card.remove();
+  document.removeEventListener('keydown', onCardEscPress);
+};
+
+/* Изменяет цену за ночь в атрибутах placeholder и min в соответствии с типом жилья */
+var onTypeSelectChange = function () {
+  var minPrice = matchTypesAndPrice();
+  inputPrice.placeholder = minPrice;
+  inputPrice.min = minPrice;
+};
+
+/* Изменяет время заезда и выезда */
+var onTimeSelectChange = function (evt) {
+  if (evt.target === timeInSelect) {
+    timeOutSelect.value = timeInSelect.value;
+  } else {
+    timeInSelect.value = timeOutSelect.value;
+  }
+};
+
+/* Удаляет карточку при нажатии на клавишу ESC */
+var onCardEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    removeCard();
+  }
+};
+
+/* Удаляет карточку при нажатии на кнопку закрытия карточки */
+var onCardCloseClick = function () {
+  removeCard();
+};
+
+/* Проверяет валидность поля с заголовком объявления */
+inputTitle.addEventListener('change', function () {
+  if (inputTitle.validity.valueMissing) {
+    inputTitle.setCustomValidity('Обязательное поле. Минимальная длина — 30 символов, максимальная — 100');
+  } else if (inputTitle.validity.patternMismatch) {
+    inputTitle.setCustomValidity('Минимальная длина — 30 символов, максимальная — 100');
+  } else {
+    inputTitle.setCustomValidity('');
+  }
+});
+
+typeOfHouseSelect.addEventListener('change', onTypeSelectChange);
+timeInSelect.addEventListener('change', onTimeSelectChange);
+timeOutSelect.addEventListener('change', onTimeSelectChange);
