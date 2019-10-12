@@ -118,13 +118,7 @@ var fillMap = function (arr) {
       if (card) {
         card.remove();
       }
-      card = createCard(item);
-      addCard(card);
-      /* Ищет кнопку закрытия карточки */
-      var cardClose = card.querySelector('.popup__close');
-      /* Закрывает карточку */
-      cardClose.addEventListener('click', onCardCloseClick);
-      document.addEventListener('keydown', onCardEscPress);
+      card = addCard(createCard(item));
     });
     /*
     Часть четвёртого задания
@@ -201,6 +195,8 @@ var createFeautures = function (arr) {
 var createCard = function (obj) {
   var defaultCard = document.querySelector('#card').content.querySelector('.map__card');
   var postCard = defaultCard.cloneNode(true);
+  /* Ищет кнопку закрытия карточки */
+  var cardClose = postCard.querySelector('.popup__close');
   /* Находит блок для фотографий */
   var album = postCard.querySelector('.popup__photos');
   /* Очищает содержимое блока для фотографий */
@@ -220,12 +216,16 @@ var createCard = function (obj) {
   postCard.querySelector('.popup__description').textContent = obj.offer.description;
   album.appendChild(createAlbum(obj.offer.photos));
   postCard.querySelector('.popup__avatar').setAttribute('src', obj.author.avatar);
+
+  /* Закрывает карточку */
+  cardClose.addEventListener('click', onCardCloseClick);
   return postCard;
 };
 
 /* Отрисовывает карточку объявления */
 var addCard = function (card) {
-  pinMap.parentNode.insertBefore(card, pinMap.nextSibling);
+  document.addEventListener('keydown', onCardEscPress);
+  return pinMap.parentNode.insertBefore(card, pinMap.nextSibling);
 };
 
 /*
@@ -355,27 +355,27 @@ var matchTypesAndPrice = function () {
   return minPrice;
 };
 
+/* Находит карточку и удаляет её. Изначально открытых карточек нет, поэтому переменную card невозможно вынести в глобальную область видимости */
+var removeCard = function () {
+  var card = map.querySelector('.map__card');
+  card.remove();
+  document.removeEventListener('keydown', onCardEscPress);
+};
+
 /* Изменяет цену за ночь в атрибутах placeholder и min в соответствии с типом жилья */
-var changePrice = function () {
+var onTypeSelectChange = function () {
   var minPrice = matchTypesAndPrice();
   inputPrice.placeholder = minPrice;
   inputPrice.min = minPrice;
 };
 
 /* Изменяет время заезда и выезда */
-var matchTimes = function (evt) {
+var onTimeSelectChange = function (evt) {
   if (evt.target === timeInSelect) {
     timeOutSelect.value = timeInSelect.value;
   } else {
     timeInSelect.value = timeOutSelect.value;
   }
-};
-
-/* Находит карточку и удаляет её. Изначально открытых карточек нет, поэтому переменную card невозможно вынести в глобальную область видимости */
-var removeCard = function () {
-  var card = map.querySelector('.map__card');
-  card.remove();
-  document.removeEventListener('keydown', onCardEscPress);
 };
 
 /* Удаляет карточку при нажатии на клавишу ESC */
@@ -391,7 +391,7 @@ var onCardCloseClick = function () {
 };
 
 /* Проверяет валидность поля с заголовком объявления */
-inputTitle.addEventListener('invalid', function () {
+inputTitle.addEventListener('change', function () {
   if (inputTitle.validity.valueMissing) {
     inputTitle.setCustomValidity('Обязательное поле. Минимальная длина — 30 символов, максимальная — 100');
   } else if (inputTitle.validity.patternMismatch) {
@@ -401,22 +401,6 @@ inputTitle.addEventListener('invalid', function () {
   }
 });
 
-/* Проверяет валидность поля с ценой за ночь */
-inputPrice.addEventListener('invalid', function () {
-  if (inputPrice.validity.valueMissing) {
-    inputPrice.setCustomValidity('Обязательное поле. Максимальное значение — 1 000 000');
-  } else if (inputPrice.validity.rangeUnderflow) {
-    inputPrice.setCustomValidity('Минимальная цена — ' + inputPrice.min);
-  } else if (inputPrice.validity.rangeOverflow) {
-    inputPrice.setCustomValidity('Максимальная цена — 1 000 000');
-  } else {
-    inputPrice.setCustomValidity('');
-  }
-});
-
-/* По умолчанию в html у нас выбран тип жилья - квартира, а атрибут placeholder минимальной цены - 5000.
-Это не соответствует ТЗ, поэтому при загрузке страницы необходимо выполнить функцию changePrice */
-document.addEventListener('DOMContentLoaded', changePrice);
-typeOfHouseSelect.addEventListener('change', changePrice);
-timeInSelect.addEventListener('change', matchTimes);
-timeOutSelect.addEventListener('change', matchTimes);
+typeOfHouseSelect.addEventListener('change', onTypeSelectChange);
+timeInSelect.addEventListener('change', onTimeSelectChange);
+timeOutSelect.addEventListener('change', onTimeSelectChange);
