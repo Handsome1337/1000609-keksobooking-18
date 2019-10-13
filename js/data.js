@@ -7,6 +7,7 @@
   var TIMES = ['12:00', '13:00', '14:00'];
   var OPTIONS = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
   var PICTURES = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
+  var MAP_WIDTH = 1200;
 
   /* Функция, которая генерирует объект с объявлением */
   var generatePost = function (number) {
@@ -30,7 +31,7 @@
       },
 
       'location': {
-        'x': window.util.getRandomInt(0, window.util.map.offsetWidth),
+        'x': window.util.getRandomInt(0, MAP_WIDTH),
         'y': window.util.getRandomInt(130, 630)
       }
     };

@@ -1,6 +1,7 @@
 'use strict';
 
 (function () {
+  var postCard = null;
 
   /* Переименовывает тип жилья в соответствии с ТЗ */
   var translateType = function (type) {
@@ -45,7 +46,7 @@
   /* Заполняет данные карточки объявления */
   var createCard = function (obj) {
     var defaultCard = document.querySelector('#card').content.querySelector('.map__card');
-    var postCard = defaultCard.cloneNode(true);
+    postCard = defaultCard.cloneNode(true);
     /* Ищет кнопку закрытия карточки */
     var cardClose = postCard.querySelector('.popup__close');
     /* Находит блок для фотографий */
@@ -75,8 +76,9 @@
 
   /* Находит карточку и удаляет её. Изначально открытых карточек нет, поэтому переменную card невозможно вынести в глобальную область видимости */
   var removeCard = function () {
-    var card = window.util.map.querySelector('.map__card');
-    card.remove();
+    if (postCard) {
+      postCard.remove();
+    }
     document.removeEventListener('keydown', onCardEscPress);
   };
 
@@ -92,6 +94,7 @@
 
   window.card = {
     createCard: createCard,
+    removeCard: removeCard,
     onCardEscPress: onCardEscPress
   };
 })();

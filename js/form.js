@@ -1,9 +1,10 @@
 'use strict';
 
 (function () {
-  /* Находит форму объявления и кнопку отправки формы */
+  /* Находит форму объявления и кнопки отправки и сброса формы */
   var form = document.querySelector('.ad-form');
   var formSubmit = form.querySelector('.ad-form__submit');
+  var formReset = form.querySelector('.ad-form__reset');
   /* Находит все элементы формы, которые недопустны в неактивном состоянии */
   var formDisabledElements = form.querySelectorAll('[disabled]');
   /* Находит select с выбором количества комнат и select с выбором количества гостей */
@@ -53,18 +54,23 @@
     addressInput.value = obj.x + ', ' + obj.y;
   };
 
-  /* Удаляет атрибут disabled у переданной в параметр коллекции элементов */
-  var removeDisabledAttr = function (arr) {
+  /* Удаляет или добавляет атрибут disabled у переданной в параметр коллекции элементов */
+  var changeDisabledAttr = function (arr, flag) {
     for (var i = 0; i < arr.length; i++) {
-      arr[i].disabled = false;
+      arr[i].disabled = flag;
     }
   };
 
-  /* Переключает форму в активное состояние */
-  var activateForm = function () {
-    form.classList.remove('ad-form--disabled');
-    removeDisabledAttr(formDisabledElements);
-    fillAddressInput(window.pin.getMainPinPosition());
+  /* Переключает активное и неактивное состояние формы */
+  var changeFormStatus = function () {
+    form.classList.toggle('ad-form--disabled');
+    if (!form.classList.contains('ad-form--disabled')) {
+      changeDisabledAttr(formDisabledElements, false);
+    } else {
+      changeDisabledAttr(formDisabledElements, true);
+      form.reset();
+    }
+    fillAddressInput(window.map.getMainPinPosition());
   };
 
   /* Изменяет цену за ночь в атрибутах placeholder и min в соответствии с типом жилья */
@@ -102,10 +108,21 @@
     высокой вероятностью не изменится, изменится количество гостей */
   });
 
-  fillAddressInput(window.pin.getMainPinPosition());
+  var setResetCallback = function (callback) {
+    formReset.addEventListener('click', function (evt) {
+      evt.preventDefault();
+      changeFormStatus();
+      callback();
+    });
+  };
+
+  fillAddressInput(window.map.getMainPinPosition());
   typeOfHouseSelect.addEventListener('change', onTypeSelectChange);
   timeInSelect.addEventListener('change', onTimeSelectChange);
   timeOutSelect.addEventListener('change', onTimeSelectChange);
 
-  window.form = activateForm;
+  window.form = {
+    changeFormStatus: changeFormStatus,
+    setResetCallback: setResetCallback
+  };
 })();

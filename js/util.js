@@ -4,9 +4,6 @@
   var ENTER_KEYCODE = 13;
   var ESC_KEYCODE = 27;
 
-  /* Переменная map вынесена в util.js, потому что она используется в нескольких модулях */
-  var map = document.querySelector('.map');
-
   /* Функция генерации случайного числа */
   var getRandomInt = function (min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -60,7 +57,6 @@
   window.util = {
     ENTER_KEYCODE: ENTER_KEYCODE,
     ESC_KEYCODE: ESC_KEYCODE,
-    map: map,
     getRandomInt: getRandomInt,
     getRandomArrElem: getRandomArrElem,
     getShuffledArr: getShuffledArr,
