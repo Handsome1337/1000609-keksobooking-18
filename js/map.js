@@ -25,7 +25,20 @@
 
   /* Переключает активное и неактивное состояние карты */
   var changeMapStatus = function () {
+    if (!map.classList.contains('map--faded')) {
+      removePins();
+      window.card.removeCard();
+    }
     map.classList.toggle('map--faded');
+  };
+
+  /* Возвращает состояние карты: активна она или нет */
+  var isMapActive = function () {
+    if (map.classList.contains('map--faded')) {
+      return false;
+    } else {
+      return true;
+    }
   };
 
   /* Отрисовывает метки на основе случайных объявлений */
@@ -59,6 +72,7 @@
     pinMap.appendChild(fragment);
   };
 
+  /* Удаляет все метки с карты */
   var removePins = function () {
     var pins = map.querySelectorAll('.map__pin:not(.map__pin--main)');
     if (pins) {
@@ -70,15 +84,14 @@
 
   /* Отрисовывает карточку объявления */
   var addCard = function (card) {
-    document.addEventListener('keydown', window.card.onCardEscPress);
     return pinMap.parentNode.insertBefore(card, pinMap.nextSibling);
   };
 
   window.map = {
-    map: map,
     mainPin: mainPin,
     getMainPinPosition: getMainPinPosition,
     changeMapStatus: changeMapStatus,
+    isMapActive: isMapActive,
     fillMap: fillMap,
     removePins: removePins
   };

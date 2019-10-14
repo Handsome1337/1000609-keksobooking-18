@@ -3,7 +3,7 @@
 (function () {
   /* Переводит страницу в активное состояние */
   var activatePage = function () {
-    if (window.map.map.classList.contains('map--faded')) {
+    if (!window.map.isMapActive()) {
       window.map.changeMapStatus();
       window.map.fillMap(window.data);
       window.form.changeFormStatus();
@@ -23,7 +23,5 @@
 
   window.form.setResetCallback(function () {
     window.map.changeMapStatus();
-    window.map.removePins();
-    window.card.removeCard();
   });
 })();

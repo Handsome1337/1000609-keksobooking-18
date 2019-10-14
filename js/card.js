@@ -71,6 +71,7 @@
 
     /* Закрывает карточку */
     cardClose.addEventListener('click', onCardCloseClick);
+    document.addEventListener('keydown', onCardEscPress);
     return postCard;
   };
 
@@ -94,7 +95,6 @@
 
   window.card = {
     createCard: createCard,
-    removeCard: removeCard,
-    onCardEscPress: onCardEscPress
+    removeCard: removeCard
   };
 })();
