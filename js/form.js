@@ -111,8 +111,9 @@
   var setResetCallback = function (callback) {
     formReset.addEventListener('click', function (evt) {
       evt.preventDefault();
-      changeFormStatus();
       callback();
+      changeFormStatus();
+      fillAddressInput(window.map.getMainPinPosition());
     });
   };
 
@@ -121,8 +122,15 @@
   timeInSelect.addEventListener('change', onTimeSelectChange);
   timeOutSelect.addEventListener('change', onTimeSelectChange);
 
+  /* 127-129 строки можно заменить на window.map.mainPin.addEventListener...(в модуле map при этом удалить обработчик перемещения главной метки),
+  то есть создать обработчик перемещения главной метки сразу в модуле form. Как лучше? */
+  window.map.setPinMoveCallback(function () {
+    fillAddressInput(window.map.getMainPinPosition());
+  });
+
   window.form = {
     changeFormStatus: changeFormStatus,
+    fillAddressInput: fillAddressInput,
     setResetCallback: setResetCallback
   };
 })();
