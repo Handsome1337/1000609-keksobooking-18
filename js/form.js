@@ -111,8 +111,9 @@
   var setResetCallback = function (callback) {
     formReset.addEventListener('click', function (evt) {
       evt.preventDefault();
-      changeFormStatus();
       callback();
+      changeFormStatus();
+      fillAddressInput(window.map.getMainPinPosition());
     });
   };
 
@@ -123,6 +124,7 @@
 
   window.form = {
     changeFormStatus: changeFormStatus,
+    fillAddressInput: fillAddressInput,
     setResetCallback: setResetCallback
   };
 })();

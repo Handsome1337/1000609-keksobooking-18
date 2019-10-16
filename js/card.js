@@ -75,10 +75,14 @@
     return postCard;
   };
 
-  /* Находит карточку и удаляет её. Изначально открытых карточек нет, поэтому переменную card невозможно вынести в глобальную область видимости */
+  /* Удаляет карточку объявления и деактивирует его метку */
   var removeCard = function () {
+    var postPin = window.map.isThereActivePin();
     if (postCard) {
       postCard.remove();
+    }
+    if (postPin) {
+      postPin.classList.remove('map__pin--active');
     }
     document.removeEventListener('keydown', onCardEscPress);
   };
