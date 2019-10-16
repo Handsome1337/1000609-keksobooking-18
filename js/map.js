@@ -112,7 +112,7 @@
   };
 
   /* Перемещает главную метку по карте */
-  var setPinMoveCallback = function (evt, callback) {
+  var movePin = function (evt, callback) {
     var startCoordinates = {
       x: evt.clientX,
       y: evt.clientY
@@ -138,7 +138,7 @@
         mainPin.style.left = mainPin.offsetLeft - offset.x + 'px';
       }
 
-      callback();
+      callback(getMainPinPosition());
     };
 
     var onMouseUp = function (upEvt) {
@@ -152,8 +152,18 @@
     document.addEventListener('mouseup', onMouseUp);
   };
 
+  /* Устанавливает обработчики событий главной метки */
+  var setMainPinHandlers = function (callback1, callback2) {
+    mainPin.addEventListener('mousedown', function (evt) {
+      callback1();
+      movePin(evt, callback2);
+    });
+    mainPin.addEventListener('keydown', function (evt) {
+      window.util.isEnterEvent(evt, callback1);
+    });
+  };
+
   window.map = {
-    mainPin: mainPin,
     getMainPinPosition: getMainPinPosition,
     setMainPinDefaultCoordinates: setMainPinDefaultCoordinates,
     changeMapStatus: changeMapStatus,
@@ -161,6 +171,6 @@
     isThereActivePin: isThereActivePin,
     fillMap: fillMap,
     removePins: removePins,
-    setPinMoveCallback: setPinMoveCallback
+    setMainPinHandlers: setMainPinHandlers
   };
 })();
