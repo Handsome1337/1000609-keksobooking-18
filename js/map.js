@@ -7,6 +7,13 @@
 
   /* Переменная map вынесена в util.js, потому что она используется в нескольких модулях */
   var map = document.querySelector('.map');
+  /* Ограничения перемещения главной метки по осям X и Y */
+  var Limit = {
+    TOP: 130 - (MAIN_PIN_HEIGHT + TAIL_OF_MAIN_PIN_HEIGHT),
+    RIGHT: map.offsetWidth - MAIN_PIN_WIDTH / 2,
+    BOTTOM: 630 - (MAIN_PIN_HEIGHT + TAIL_OF_MAIN_PIN_HEIGHT),
+    LEFT: -MAIN_PIN_WIDTH / 2
+  };
   var pinMap = map.querySelector('.map__pins');
   /* Находит главную метку, взаимодействие с которой переводит страницу в активное состояние */
   var mainPin = map.querySelector('.map__pin--main');
@@ -104,55 +111,45 @@
     return pinMap.parentNode.insertBefore(card, pinMap.nextSibling);
   };
 
-  var setPinMoveCallback = function (callback) {
-    mainPin.addEventListener('mousedown', function (evt) {
-      evt.preventDefault();
+  /* Перемещает главную метку по карте */
+  var setPinMoveCallback = function (evt, callback) {
+    var startCoordinates = {
+      x: evt.clientX,
+      y: evt.clientY
+    };
 
-      var startCoordinates = {
-        x: evt.clientX,
-        y: evt.clientY
+    var onMouseMove = function (moveEvt) {
+      moveEvt.preventDefault();
+
+      var offset = {
+        x: startCoordinates.x - moveEvt.clientX,
+        y: startCoordinates.y - moveEvt.clientY
       };
 
-      var Limit = {
-        TOP: 130 - (MAIN_PIN_HEIGHT + TAIL_OF_MAIN_PIN_HEIGHT),
-        RIGHT: map.offsetWidth - MAIN_PIN_WIDTH / 2,
-        BOTTOM: 630 - (MAIN_PIN_HEIGHT + TAIL_OF_MAIN_PIN_HEIGHT),
-        LEFT: -MAIN_PIN_WIDTH / 2
+      startCoordinates = {
+        x: moveEvt.clientX,
+        y: moveEvt.clientY
       };
 
-      var onMouseMove = function (moveEvt) {
-        moveEvt.preventDefault();
+      if (mainPin.offsetTop - offset.y >= Limit.TOP && mainPin.offsetTop - offset.y <= Limit.BOTTOM) {
+        mainPin.style.top = mainPin.offsetTop - offset.y + 'px';
+      }
+      if (mainPin.offsetLeft - offset.x >= Limit.LEFT && mainPin.offsetLeft - offset.x <= Limit.RIGHT) {
+        mainPin.style.left = mainPin.offsetLeft - offset.x + 'px';
+      }
 
-        var offset = {
-          x: startCoordinates.x - moveEvt.clientX,
-          y: startCoordinates.y - moveEvt.clientY
-        };
+      callback();
+    };
 
-        startCoordinates = {
-          x: moveEvt.clientX,
-          y: moveEvt.clientY
-        };
+    var onMouseUp = function (upEvt) {
+      upEvt.preventDefault();
 
-        if (mainPin.offsetTop - offset.y >= Limit.TOP && mainPin.offsetTop - offset.y <= Limit.BOTTOM) {
-          mainPin.style.top = mainPin.offsetTop - offset.y + 'px';
-        }
-        if (mainPin.offsetLeft - offset.x >= Limit.LEFT && mainPin.offsetLeft - offset.x <= Limit.RIGHT) {
-          mainPin.style.left = mainPin.offsetLeft - offset.x + 'px';
-        }
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
 
-        callback();
-      };
-
-      var onMouseUp = function (upEvt) {
-        upEvt.preventDefault();
-
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
-      };
-
-      document.addEventListener('mousemove', onMouseMove);
-      document.addEventListener('mouseup', onMouseUp);
-    });
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
   };
 
   window.map = {
