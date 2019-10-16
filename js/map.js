@@ -153,13 +153,13 @@
   };
 
   /* Устанавливает обработчики событий главной метки */
-  var setMainPinHandlers = function (callback1, callback2) {
+  var setMainPinHandlers = function (mainPinPressCallback, mainPinMoveCallback) {
     mainPin.addEventListener('mousedown', function (evt) {
-      callback1();
-      movePin(evt, callback2);
+      mainPinPressCallback();
+      movePin(evt, mainPinMoveCallback);
     });
     mainPin.addEventListener('keydown', function (evt) {
-      window.util.isEnterEvent(evt, callback1);
+      window.util.isEnterEvent(evt, mainPinPressCallback);
     });
   };
 
