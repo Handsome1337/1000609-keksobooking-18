@@ -25,7 +25,7 @@
         'guests': window.util.getRandomInt(1, 15),
         'checkin': window.util.getRandomArrElem(TIMES),
         'checkout': window.util.getRandomArrElem(TIMES),
-        'feautures': window.util.getShuffledArr(OPTIONS).slice(0, window.util.getRandomInt(1, OPTIONS.length)),
+        'features': window.util.getShuffledArr(OPTIONS).slice(0, window.util.getRandomInt(1, OPTIONS.length)),
         'description': 'строка с описанием',
         'photos': window.util.getShuffledArr(PICTURES).slice(0, window.util.getRandomInt(1, PICTURES.length))
       },

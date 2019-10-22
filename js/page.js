@@ -5,7 +5,7 @@
   var activatePage = function () {
     if (!window.map.isMapActive()) {
       window.map.changeMapStatus();
-      window.map.fillMap(window.data);
+      window.load(window.map.onSuccessFillMap, window.error.onError);
       window.form.changeFormStatus();
     }
   };

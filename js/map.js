@@ -65,7 +65,7 @@
     }
   };
 
-  /* Отрисовывает метки на основе случайных объявлений */
+  /* Отрисовывает метки на основе полученных объявлений */
   var fillMap = function (arr) {
     var fragment = document.createDocumentFragment();
 
@@ -169,7 +169,7 @@
     changeMapStatus: changeMapStatus,
     isMapActive: isMapActive,
     isThereActivePin: isThereActivePin,
-    fillMap: fillMap,
+    onSuccessFillMap: fillMap,
     removePins: removePins,
     setMainPinHandlers: setMainPinHandlers
   };
