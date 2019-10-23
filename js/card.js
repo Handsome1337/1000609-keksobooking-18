@@ -32,12 +32,12 @@
   };
 
   /* Создаёт коллекцию опций */
-  var createFeautures = function (arr) {
+  var createFeatures = function (arr) {
     var fragment = document.createDocumentFragment();
 
     for (var i = 0; i < arr.length; i++) {
-      var feauture = window.util.createElem('li', 'popup__feature popup__feature--' + arr[i]);
-      fragment.appendChild(feauture);
+      var feature = window.util.createElem('li', 'popup__feature popup__feature--' + arr[i]);
+      fragment.appendChild(feature);
     }
 
     return fragment;
@@ -54,9 +54,9 @@
     /* Очищает содержимое блока для фотографий */
     album.textContent = '';
     /* Находит блок для списка опций */
-    var feauturesList = postCard.querySelector('.popup__features');
+    var featuresList = postCard.querySelector('.popup__features');
     /* Очищает содержимое блока для списка опций */
-    feauturesList.textContent = '';
+    featuresList.textContent = '';
 
     postCard.querySelector('.popup__title').textContent = obj.offer.title;
     postCard.querySelector('.popup__text--address').textContent = obj.offer.address;
@@ -64,7 +64,7 @@
     postCard.querySelector('.popup__type').textContent = translateType(obj.offer.type);
     postCard.querySelector('.popup__text--capacity').textContent = obj.offer.rooms + ' комнаты для ' + obj.offer.guests + ' гостей';
     postCard.querySelector('.popup__text--time').textContent = 'Заезд после ' + obj.offer.checkin + ', выезд до ' + obj.offer.checkout;
-    feauturesList.appendChild(createFeautures(obj.offer.feautures));
+    featuresList.appendChild(createFeatures(obj.offer.features));
     postCard.querySelector('.popup__description').textContent = obj.offer.description;
     album.appendChild(createAlbum(obj.offer.photos));
     postCard.querySelector('.popup__avatar').setAttribute('src', obj.author.avatar);

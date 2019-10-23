@@ -5,7 +5,11 @@
   var activatePage = function () {
     if (!window.map.isMapActive()) {
       window.map.changeMapStatus();
-      window.map.fillMap(window.data);
+      window.load(function (data) {
+        window.map.fillMap(data);
+      }, function () {
+        window.error.showErrorMessage();
+      });
       window.form.changeFormStatus();
     }
   };

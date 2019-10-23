@@ -65,7 +65,7 @@
     }
   };
 
-  /* Отрисовывает метки на основе случайных объявлений */
+  /* Отрисовывает метки на основе полученных объявлений */
   var fillMap = function (arr) {
     var fragment = document.createDocumentFragment();
 
