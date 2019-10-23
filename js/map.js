@@ -169,7 +169,7 @@
     changeMapStatus: changeMapStatus,
     isMapActive: isMapActive,
     isThereActivePin: isThereActivePin,
-    onSuccessFillMap: fillMap,
+    fillMap: fillMap,
     removePins: removePins,
     setMainPinHandlers: setMainPinHandlers
   };

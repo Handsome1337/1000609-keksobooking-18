@@ -39,6 +39,6 @@
   };
 
   window.error = {
-    onError: onError
+    showErrorMessage: onError
   };
 })();
