@@ -108,12 +108,17 @@
     высокой вероятностью не изменится, изменится количество гостей */
   });
 
+  var setSubmitCallbacks = function (successSubmitCallback, errorSubmitCallback) {
+    form.addEventListener('submit', function (evt) {
+      window.upload(new FormData(form), successSubmitCallback, errorSubmitCallback);
+      evt.preventDefault();
+    });
+  };
+
   var setResetCallback = function (callback) {
     formReset.addEventListener('click', function (evt) {
       evt.preventDefault();
       callback();
-      changeFormStatus();
-      fillAddressInput(window.map.getMainPinPosition());
     });
   };
 
@@ -125,6 +130,7 @@
   window.form = {
     changeFormStatus: changeFormStatus,
     fillAddressInput: fillAddressInput,
+    setSubmitCallbacks: setSubmitCallbacks,
     setResetCallback: setResetCallback
   };
 })();
