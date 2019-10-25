@@ -110,7 +110,7 @@
 
   var setSubmitCallbacks = function (successSubmitCallback, errorSubmitCallback) {
     form.addEventListener('submit', function (evt) {
-      window.upload(new FormData(form), successSubmitCallback, errorSubmitCallback);
+      window.server.upload(new FormData(form), successSubmitCallback, errorSubmitCallback);
       evt.preventDefault();
     });
   };

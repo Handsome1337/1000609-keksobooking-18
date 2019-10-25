@@ -5,10 +5,10 @@
   var activatePage = function () {
     if (!window.map.isMapActive()) {
       window.map.changeMapStatus();
-      window.load(function (data) {
+      window.server.load(function (data) {
         window.map.fillMap(data);
       }, function () {
-        window.error.showErrorMessage();
+        window.message.showErrorMessage();
       });
       window.form.changeFormStatus();
     }
@@ -32,9 +32,9 @@
   /* Обрабатывает отправку формы */
   window.form.setSubmitCallbacks(function () {
     deactivatePage();
-    window.success.showSuccessMessage();
+    window.message.showSuccessMessage();
   }, function () {
     window.card.removeCard();
-    window.error.showErrorMessage();
+    window.message.showErrorMessage();
   });
 })();
