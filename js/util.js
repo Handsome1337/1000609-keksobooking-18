@@ -40,6 +40,13 @@
     return newImg;
   };
 
+  /* Удаляет или добавляет атрибут disabled у переданной в параметр коллекции элементов */
+  var changeDisabledAttr = function (arr, flag) {
+    for (var i = 0; i < arr.length; i++) {
+      arr[i].disabled = flag;
+    }
+  };
+
   /* Если событие произошло при нажатии на клавишу Enter, выполняет функцию, передаваемую вторым параметром */
   var isEnterEvent = function (evt, action) {
     if (evt.keyCode === ENTER_KEYCODE) {
@@ -62,6 +69,7 @@
     getShuffledArr: getShuffledArr,
     createElem: createElem,
     createImg: createImg,
+    changeDisabledAttr: changeDisabledAttr,
     isEnterEvent: isEnterEvent,
     isEscEvent: isEscEvent
   };

@@ -1,11 +1,14 @@
 'use strict';
 
 (function () {
+  var SUCCESS_CODE = 200;
+  var TIMEOUT_DURATION = 10000; // 10s
+
   /* Формирует xhr-объект */
   var createXhr = function (method, url, onSuccess, onError, data) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
-    xhr.timeout = 10000; // 10s
+    xhr.timeout = TIMEOUT_DURATION; // 10s
 
     xhr.open(method, url);
     if (data) {
@@ -15,9 +18,9 @@
     }
 
     xhr.addEventListener('load', function () {
-      if (xhr.statuss === 200 && data) {
+      if (xhr.statuss === SUCCESS_CODE && data) {
         onSuccess();
-      } else if (xhr.status === 200) {
+      } else if (xhr.status === SUCCESS_CODE) {
         onSuccess(xhr.response);
       } else {
         onError();

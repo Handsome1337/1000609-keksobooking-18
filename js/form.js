@@ -54,20 +54,13 @@
     addressInput.value = obj.x + ', ' + obj.y;
   };
 
-  /* Удаляет или добавляет атрибут disabled у переданной в параметр коллекции элементов */
-  var changeDisabledAttr = function (arr, flag) {
-    for (var i = 0; i < arr.length; i++) {
-      arr[i].disabled = flag;
-    }
-  };
-
   /* Переключает активное и неактивное состояние формы */
   var changeFormStatus = function () {
     form.classList.toggle('ad-form--disabled');
     if (!form.classList.contains('ad-form--disabled')) {
-      changeDisabledAttr(formDisabledElements, false);
+      window.util.changeDisabledAttr(formDisabledElements, false);
     } else {
-      changeDisabledAttr(formDisabledElements, true);
+      window.util.changeDisabledAttr(formDisabledElements, true);
       form.reset();
     }
     fillAddressInput(window.map.getMainPinPosition());
