@@ -29,13 +29,12 @@
   };
 
   /* Заполняет карту в соответствии со всеми фильтрами */
-  var setFilterOffersCallback = function (data, removeCardCallback, fillMapCallback) {
-    var offers = data;
-    housingType.addEventListener('change', function () {
-      removeCardCallback();
-      fillMapCallback(filterQuantity(filterHousingType(offers)));
+  var setFilterOffersCallback = function (data, callback) {
+    var offers = data.slice();
+    filtersForm.addEventListener('change', function () {
+      callback(filterQuantity(filterHousingType(offers)));
     });
-    fillMapCallback(filterQuantity(filterHousingType(offers)));
+    callback(filterQuantity(filterHousingType(offers)));
   };
 
   window.filter = {
