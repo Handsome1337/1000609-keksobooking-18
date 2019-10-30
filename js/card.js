@@ -3,20 +3,12 @@
 (function () {
   var postCard = null;
 
-  /* Переименовывает тип жилья в соответствии с ТЗ */
-  var translateType = function (type) {
-    switch (type) {
-      case 'palace':
-        return 'Дворец';
-      case 'flat':
-        return 'Квартира';
-      case 'house':
-        return 'Дом';
-      case 'bungalo':
-        return 'Бунгало';
-      default:
-        return type;
-    }
+  /* Словарь типов жилья */
+  var typeMap = {
+    'palace': 'Дворец',
+    'flat': 'Квартира',
+    'house': 'Дом',
+    'bungalo': 'Бунгало'
   };
 
   /* Создаёт коллекцию фотографий жилья */
@@ -61,7 +53,7 @@
     postCard.querySelector('.popup__title').textContent = obj.offer.title;
     postCard.querySelector('.popup__text--address').textContent = obj.offer.address;
     postCard.querySelector('.popup__text--price').textContent = obj.offer.price + '₽/ночь';
-    postCard.querySelector('.popup__type').textContent = translateType(obj.offer.type);
+    postCard.querySelector('.popup__type').textContent = typeMap[obj.offer.type];
     postCard.querySelector('.popup__text--capacity').textContent = obj.offer.rooms + ' комнаты для ' + obj.offer.guests + ' гостей';
     postCard.querySelector('.popup__text--time').textContent = 'Заезд после ' + obj.offer.checkin + ', выезд до ' + obj.offer.checkout;
     featuresList.appendChild(createFeatures(obj.offer.features));

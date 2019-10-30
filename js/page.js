@@ -5,8 +5,12 @@
   var activatePage = function () {
     if (!window.map.isMapActive()) {
       window.map.changeMapStatus();
+      window.filter.changeFiltersStatus(false);
       window.server.load(function (data) {
-        window.map.fillMap(data);
+        window.filter.setFilterOffersCallback(data, function (filteredData) {
+          window.card.removeCard();
+          window.map.fillMap(filteredData);
+        });
       }, function () {
         window.message.showErrorMessage();
       });
@@ -17,6 +21,7 @@
   /* Переводит страницу в неактивное состояние */
   var deactivatePage = function () {
     window.map.changeMapStatus();
+    window.filter.changeFiltersStatus(true);
     window.map.setMainPinDefaultCoordinates();
     window.form.changeFormStatus();
   };

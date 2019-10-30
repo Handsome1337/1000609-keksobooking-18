@@ -67,6 +67,8 @@
 
   /* Отрисовывает метки на основе полученных объявлений */
   var fillMap = function (arr) {
+    /* Удаляет метки, если они есть */
+    removePins();
     var fragment = document.createDocumentFragment();
 
     arr.forEach(function (item) {
