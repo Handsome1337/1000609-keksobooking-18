@@ -5,8 +5,6 @@
   var ESC_KEYCODE = 27;
   var DEBOUNCE_DURATION = 500; // полсекунды
 
-  var lastTimeout = null;
-
   /* Функция генерации случайного числа */
   var getRandomInt = function (min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -66,12 +64,17 @@
 
   /* Устранение дребезга */
   var debounce = function (callback) {
-    if (lastTimeout) {
-      window.clearTimeout(lastTimeout);
-    }
-    lastTimeout = window.setTimeout(function () {
-      callback();
-    }, DEBOUNCE_DURATION);
+    var lastTimeout = null;
+
+    return function () {
+      var parameters = arguments;
+      if (lastTimeout) {
+        window.clearTimeout(lastTimeout);
+      }
+      lastTimeout = window.setTimeout(function () {
+        callback.apply(null, parameters);
+      }, DEBOUNCE_DURATION);
+    };
   };
 
   window.util = {

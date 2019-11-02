@@ -40,42 +40,25 @@
 
   /* Фильтрует по типу жилья */
   var filterHousingType = function (offer) {
-    if (housingType.value === 'any') {
-      return offer;
-    } else {
-      return offer.offer.type === housingType.value;
-    }
+    return housingType.value === 'any' || offer.offer.type === housingType.value;
   };
 
   /* Фильтрует по цене */
   var filterHousingPrice = function (offer) {
-    if (housingPrice.value === 'any') {
-      return offer;
-    } else if (housingPrice.value === 'middle') {
-      return comparePrice(offer.offer.price, Price.MIDDLE, Price.TOP);
-    } else if (housingPrice.value === 'low') {
-      return comparePrice(offer.offer.price, Price.BOTTOM, Price.MIDDLE);
-    } else {
-      return comparePrice(offer.offer.price, Price.TOP, Price.INFINITY);
-    }
+    return housingPrice.value === 'any' ||
+     housingPrice.value === 'middle' && comparePrice(offer.offer.price, Price.MIDDLE, Price.TOP) ||
+     housingPrice.value === 'low' && comparePrice(offer.offer.price, Price.BOTTOM, Price.MIDDLE) ||
+     housingPrice.value === 'high' && comparePrice(offer.offer.price, Price.TOP, Price.INFINITY);
   };
 
   /* Фильтрует по количеству комнат */
   var filterHousingRooms = function (offer) {
-    if (housingRoom.value === 'any') {
-      return offer;
-    } else {
-      return offer.offer.rooms === parseInt(housingRoom.value, 10);
-    }
+    return housingRoom.value === 'any' || offer.offer.rooms === parseInt(housingRoom.value, 10);
   };
 
   /* Фильтрует по количеству гостей */
   var filterHousingGuests = function (offer) {
-    if (housingGuest.value === 'any') {
-      return offer;
-    } else {
-      return offer.offer.guests === parseInt(housingGuest.value, 10);
-    }
+    return housingGuest.value === 'any' || offer.offer.guests === parseInt(housingGuest.value, 10);
   };
 
   /* Фильтрует по доступным опциям */
@@ -97,10 +80,11 @@
 
   /* Заполняет карту в соответствии со всеми фильтрами */
   var setFilterOffersCallback = function (data, callback) {
+    var callbackWidthDelay = window.util.debounce(function () {
+      callback(filterPosts(data));
+    });
     filtersForm.addEventListener('change', function () {
-      window.util.debounce(function () {
-        callback(filterPosts(data));
-      });
+      callbackWidthDelay();
     });
     callback(filterPosts(data));
     changeFiltersStatus(false);
