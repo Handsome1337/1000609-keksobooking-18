@@ -3,6 +3,9 @@
 (function () {
   var ENTER_KEYCODE = 13;
   var ESC_KEYCODE = 27;
+  var DEBOUNCE_DURATION = 500; // полсекунды
+
+  var lastTimeout = null;
 
   /* Функция генерации случайного числа */
   var getRandomInt = function (min, max) {
@@ -61,6 +64,16 @@
     }
   };
 
+  /* Устранение дребезга */
+  var debounce = function (callback) {
+    if (lastTimeout) {
+      window.clearTimeout(lastTimeout);
+    }
+    lastTimeout = window.setTimeout(function () {
+      callback();
+    }, DEBOUNCE_DURATION);
+  };
+
   window.util = {
     ENTER_KEYCODE: ENTER_KEYCODE,
     ESC_KEYCODE: ESC_KEYCODE,
@@ -71,6 +84,7 @@
     createImg: createImg,
     changeDisabledAttr: changeDisabledAttr,
     isEnterEvent: isEnterEvent,
-    isEscEvent: isEscEvent
+    isEscEvent: isEscEvent,
+    debounce: debounce
   };
 })();
