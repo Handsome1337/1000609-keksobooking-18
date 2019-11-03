@@ -5,7 +5,6 @@
   var activatePage = function () {
     if (!window.map.isMapActive()) {
       window.map.changeMapStatus();
-      window.filter.changeFiltersStatus(false);
       window.server.load(function (data) {
         window.filter.setFilterOffersCallback(data, function (filteredData) {
           window.card.removeCard();
