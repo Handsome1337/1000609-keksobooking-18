@@ -18,9 +18,9 @@
   /* Находит главную метку, взаимодействие с которой переводит страницу в активное состояние */
   var mainPin = map.querySelector('.map__pin--main');
   /* Находит координаты главной метки по умолчанию */
-  var MainPinDefaultCoordinates = {
-    'x': mainPin.style.left,
-    'y': mainPin.style.top
+  var MainPinDefaultCoordinate = {
+    X: mainPin.style.left,
+    Y: mainPin.style.top
   };
 
   /* Находит координаты главный метки */
@@ -37,8 +37,8 @@
 
   /* Перемещает главную метку в позицию по умолчанию */
   var setMainPinDefaultCoordinates = function () {
-    mainPin.style.top = MainPinDefaultCoordinates.y;
-    mainPin.style.left = MainPinDefaultCoordinates.x;
+    mainPin.style.top = MainPinDefaultCoordinate.Y;
+    mainPin.style.left = MainPinDefaultCoordinate.X;
   };
 
   /* Переключает активное и неактивное состояние карты */
@@ -72,27 +72,31 @@
     var fragment = document.createDocumentFragment();
 
     arr.forEach(function (item) {
-      var pinElement = window.pin(item);
+      if ('offer' in item) {
+        var pinElement = window.pin(item);
 
-      pinElement.addEventListener('click', function () {
-        /* Находит карточку объявления */
-        var card = map.querySelector('.map__card');
-        /* Находит активную метку */
-        var activePin = isThereActivePin();
-        /* Деактивирует метку, которую ранее активировал пользователь, если такая была */
-        if (activePin) {
-          activePin.classList.remove('map__pin--active');
-        }
-        /* Активирует метку */
-        pinElement.classList.add('map__pin--active');
-        /* Если ранее была открыта какая-либо карточка, удаляет её */
-        if (card) {
-          card.remove();
-        }
-        card = addCard(window.card.createCard(item));
-      });
+        pinElement.addEventListener('click', function () {
+          /* Находит карточку объявления */
+          var card = map.querySelector('.map__card');
+          /* Находит активную метку */
+          var activePin = isThereActivePin();
+          /* Деактивирует метку, которую ранее активировал пользователь, если такая была */
+          if (activePin) {
+            activePin.classList.remove('map__pin--active');
+          }
+          /* Активирует метку */
+          pinElement.classList.add('map__pin--active');
+          /* Если ранее была открыта какая-либо карточка, удаляет её */
+          if (card) {
+            card.remove();
+          }
+          card = addCard(window.card.createCard(item, function () {
+            pinElement.classList.remove('map__pin--active');
+          }));
+        });
 
-      fragment.appendChild(pinElement);
+        fragment.appendChild(pinElement);
+      }
     });
 
     pinMap.appendChild(fragment);
@@ -102,9 +106,9 @@
   var removePins = function () {
     var pins = map.querySelectorAll('.map__pin:not(.map__pin--main)');
     if (pins) {
-      for (var i = 0; i < pins.length; i++) {
-        pins[i].remove();
-      }
+      pins.forEach(function (pin) {
+        pin.remove();
+      });
     }
   };
 

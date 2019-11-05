@@ -1,7 +1,11 @@
 'use strict';
 
 (function () {
+  var PHOTO_WIDTH = 45;
+  var PHOTO_HEIGHT = 40;
+
   var postCard = null;
+  var closeCallback = null;
 
   /* Словарь типов жилья */
   var typeMap = {
@@ -15,10 +19,10 @@
   var createAlbum = function (arr) {
     var fragment = document.createDocumentFragment();
 
-    for (var i = 0; i < arr.length; i++) {
-      var photo = window.util.createImg(arr[i], 45, 40, 'Фотография жилья', 'popup__photo');
+    arr.forEach(function (item) {
+      var photo = window.util.createImg(item, PHOTO_WIDTH, PHOTO_HEIGHT, 'Фотография жилья', 'popup__photo');
       fragment.appendChild(photo);
-    }
+    });
 
     return fragment;
   };
@@ -27,18 +31,20 @@
   var createFeatures = function (arr) {
     var fragment = document.createDocumentFragment();
 
-    for (var i = 0; i < arr.length; i++) {
-      var feature = window.util.createElem('li', 'popup__feature popup__feature--' + arr[i]);
+    arr.forEach(function (item) {
+      var feature = window.util.createElem('li', 'popup__feature popup__feature--' + item);
       fragment.appendChild(feature);
-    }
+    });
 
     return fragment;
   };
 
   /* Заполняет данные карточки объявления */
-  var createCard = function (obj) {
+  var createCard = function (obj, callback) {
+    closeCallback = callback;
     var defaultCard = document.querySelector('#card').content.querySelector('.map__card');
     postCard = defaultCard.cloneNode(true);
+    var cardElements = postCard.querySelectorAll(':not(img)');
     /* Ищет кнопку закрытия карточки */
     var cardClose = postCard.querySelector('.popup__close');
     /* Находит блок для фотографий */
@@ -61,6 +67,12 @@
     album.appendChild(createAlbum(obj.offer.photos));
     postCard.querySelector('.popup__avatar').setAttribute('src', obj.author.avatar);
 
+    cardElements.forEach(function (elem) {
+      if (!elem.innerHTML) {
+        elem.remove();
+      }
+    });
+
     /* Закрывает карточку */
     cardClose.addEventListener('click', onCardCloseClick);
     document.addEventListener('keydown', onCardEscPress);
@@ -69,12 +81,11 @@
 
   /* Удаляет карточку объявления и деактивирует его метку */
   var removeCard = function () {
-    var postPin = window.map.isThereActivePin();
     if (postCard) {
       postCard.remove();
     }
-    if (postPin) {
-      postPin.classList.remove('map__pin--active');
+    if (closeCallback) {
+      closeCallback();
     }
     document.removeEventListener('keydown', onCardEscPress);
   };

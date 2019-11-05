@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  var IMAGE_TYPES = ['gif', 'jpg', 'jpeg', 'png', 'svg', 'webp'];
+
   /* Находит форму объявления и кнопки отправки и сброса формы */
   var form = document.querySelector('.ad-form');
   var formSubmit = form.querySelector('.ad-form__submit');
@@ -17,6 +19,10 @@
   var typeOfHouseSelect = form.querySelector('#type');
   var timeInSelect = form.querySelector('#timein');
   var timeOutSelect = form.querySelector('#timeout');
+  var avatarChooser = form.querySelector('#avatar');
+  var imageChooser = form.querySelector('#images');
+  var avatarPreview = form.querySelector('img');
+  var imagePreview = form.querySelector('.ad-form__photo');
 
   /* Сопоставляет количество комнат с количеством гостей */
   var matchRoomsAndGuests = function () {
@@ -55,15 +61,19 @@
   };
 
   /* Переключает активное и неактивное состояние формы */
-  var changeFormStatus = function () {
+  var changeFormStatus = function (callback) {
     form.classList.toggle('ad-form--disabled');
     if (!form.classList.contains('ad-form--disabled')) {
       window.util.changeDisabledAttr(formDisabledElements, false);
+      readImageFile(avatarChooser, avatarPreview);
+      readImageFile(imageChooser, imagePreview);
     } else {
       window.util.changeDisabledAttr(formDisabledElements, true);
       form.reset();
+      avatarPreview.src = 'img/muffin-grey.svg';
+      imagePreview.textContent = '';
     }
-    fillAddressInput(window.map.getMainPinPosition());
+    fillAddressInput(callback);
   };
 
   /* Изменяет цену за ночь в атрибутах placeholder и min в соответствии с типом жилья */
@@ -80,6 +90,40 @@
     } else {
       timeInSelect.value = timeOutSelect.value;
     }
+  };
+
+  /* Добавляет картинку пользователя или фотографию жилья при загрузке в chooser в блок preview */
+  var readImageFile = function (chooser, preview) {
+    if (preview.tagName !== 'IMG') {
+      var previewParent = preview;
+      preview = window.util.createImg('img/muffin-grey.svg', previewParent.offsetWidth, previewParent.offsetHeight, 'Фотография жилья');
+    }
+
+    chooser.addEventListener('change', function () {
+      var file = chooser.files[0];
+
+      if (file) {
+        var fileName = file.name.toLowerCase();
+        var matches = IMAGE_TYPES.some(function (type) {
+          return fileName.endsWith(type);
+        });
+
+        if (matches) {
+          var reader = new FileReader();
+
+          reader.addEventListener('load', function () {
+            preview.src = reader.result;
+          });
+
+          reader.readAsDataURL(file);
+
+          if (previewParent) {
+            previewParent.textContent = '';
+            previewParent.appendChild(preview);
+          }
+        }
+      }
+    });
   };
 
   /* Проверяет валидность поля с заголовком объявления */
@@ -101,9 +145,9 @@
     высокой вероятностью не изменится, изменится количество гостей */
   });
 
-  var setSubmitCallbacks = function (successSubmitCallback, errorSubmitCallback) {
+  var setSubmitCallback = function (submitCallback) {
     form.addEventListener('submit', function (evt) {
-      window.server.upload(new FormData(form), successSubmitCallback, errorSubmitCallback);
+      submitCallback(form);
       evt.preventDefault();
     });
   };
@@ -115,7 +159,6 @@
     });
   };
 
-  fillAddressInput(window.map.getMainPinPosition());
   typeOfHouseSelect.addEventListener('change', onTypeSelectChange);
   timeInSelect.addEventListener('change', onTimeSelectChange);
   timeOutSelect.addEventListener('change', onTimeSelectChange);
@@ -123,7 +166,7 @@
   window.form = {
     changeFormStatus: changeFormStatus,
     fillAddressInput: fillAddressInput,
-    setSubmitCallbacks: setSubmitCallbacks,
+    setSubmitCallback: setSubmitCallback,
     setResetCallback: setResetCallback
   };
 })();

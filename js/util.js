@@ -1,9 +1,12 @@
 'use strict';
 
 (function () {
-  var ENTER_KEYCODE = 13;
-  var ESC_KEYCODE = 27;
   var DEBOUNCE_DURATION = 500; // полсекунды
+
+  var KeyCode = {
+    ENTER: 13,
+    ESC: 27
+  };
 
   /* Функция генерации случайного числа */
   var getRandomInt = function (min, max) {
@@ -27,7 +30,9 @@
   /* Создает новый элемент с заданным атрибутом class */
   var createElem = function (elemName, elemClass) {
     var newElement = document.createElement(elemName);
-    newElement.className = elemClass;
+    if (elemClass) {
+      newElement.className = elemClass;
+    }
     return newElement;
   };
 
@@ -43,21 +48,21 @@
 
   /* Удаляет или добавляет атрибут disabled у переданной в параметр коллекции элементов */
   var changeDisabledAttr = function (arr, flag) {
-    for (var i = 0; i < arr.length; i++) {
-      arr[i].disabled = flag;
-    }
+    arr.forEach(function (item) {
+      item.disabled = flag;
+    });
   };
 
   /* Если событие произошло при нажатии на клавишу Enter, выполняет функцию, передаваемую вторым параметром */
   var isEnterEvent = function (evt, action) {
-    if (evt.keyCode === ENTER_KEYCODE) {
+    if (evt.keyCode === KeyCode.ENTER) {
       action();
     }
   };
 
   /* Если событие произошло при нажатии на клавишу ESC, выполняет функцию, передаваемую вторым параметром */
   var isEscEvent = function (evt, action) {
-    if (evt.keyCode === ESC_KEYCODE) {
+    if (evt.keyCode === KeyCode.ESC) {
       action();
     }
   };
@@ -78,8 +83,8 @@
   };
 
   window.util = {
-    ENTER_KEYCODE: ENTER_KEYCODE,
-    ESC_KEYCODE: ESC_KEYCODE,
+    ENTER_KEYCODE: KeyCode.ENTER,
+    ESC_KEYCODE: KeyCode.ESC,
     getRandomInt: getRandomInt,
     getRandomArrElem: getRandomArrElem,
     getShuffledArr: getShuffledArr,
