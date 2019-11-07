@@ -3,6 +3,12 @@
 (function () {
   var IMAGE_TYPES = ['gif', 'jpg', 'jpeg', 'png', 'svg', 'webp'];
 
+  /* Размеры превью фотографий жилья в форме объявления пользователя*/
+  var PhotoSize = {
+    WIDTH: 70,
+    HEIGHT: 70
+  };
+
   /* Находит форму объявления и кнопки отправки и сброса формы */
   var form = document.querySelector('.ad-form');
   var formSubmit = form.querySelector('.ad-form__submit');
@@ -22,7 +28,8 @@
   var avatarChooser = form.querySelector('#avatar');
   var imageChooser = form.querySelector('#images');
   var avatarPreview = form.querySelector('img');
-  var imagePreview = form.querySelector('.ad-form__photo');
+  var imagePreviewContainer = form.querySelector('.ad-form__photo-container');
+  var imagePreviewParent = imagePreviewContainer.querySelector('.ad-form__photo');
 
   /* Сопоставляет количество комнат с количеством гостей */
   var matchRoomsAndGuests = function () {
@@ -66,12 +73,11 @@
     if (!form.classList.contains('ad-form--disabled')) {
       window.util.changeDisabledAttr(formDisabledElements, false);
       readImageFile(avatarChooser, avatarPreview);
-      readImageFile(imageChooser, imagePreview);
+      readImageFile(imageChooser, imagePreviewContainer);
     } else {
       window.util.changeDisabledAttr(formDisabledElements, true);
       form.reset();
-      avatarPreview.src = 'img/muffin-grey.svg';
-      imagePreview.textContent = '';
+      removePreviews();
     }
     fillAddressInput(callback);
   };
@@ -94,15 +100,14 @@
 
   /* Добавляет картинку пользователя или фотографию жилья при загрузке в chooser в блок preview */
   var readImageFile = function (chooser, preview) {
-    if (preview.tagName !== 'IMG') {
-      var previewParent = preview;
-      preview = window.util.createImg('img/muffin-grey.svg', previewParent.offsetWidth, previewParent.offsetHeight, 'Фотография жилья');
-    }
 
     chooser.addEventListener('change', function () {
-      var file = chooser.files[0];
+      if (preview.tagName !== 'IMG') {
+        var previewContainer = preview;
+        imagePreviewParent.remove();
+      }
 
-      if (file) {
+      Array.from(chooser.files).forEach(function (file) {
         var fileName = file.name.toLowerCase();
         var matches = IMAGE_TYPES.some(function (type) {
           return fileName.endsWith(type);
@@ -111,19 +116,31 @@
         if (matches) {
           var reader = new FileReader();
 
-          reader.addEventListener('load', function () {
-            preview.src = reader.result;
+          reader.addEventListener('load', function (event) {
+            if (previewContainer) {
+              var previewParent = window.util.createElem('div', 'ad-form__photo');
+              var previewPhoto = window.util.createImg('img/muffin-grey.svg', PhotoSize.WIDTH, PhotoSize.HEIGHT, 'Фотография жилья');
+              previewPhoto.src = event.target.result;
+              previewParent.appendChild(previewPhoto);
+              previewContainer.appendChild(previewParent);
+            } else {
+              preview.src = reader.result;
+            }
           });
-
           reader.readAsDataURL(file);
 
-          if (previewParent) {
-            previewParent.textContent = '';
-            previewParent.appendChild(preview);
-          }
         }
-      }
+      });
     });
+  };
+
+  /* Удаляет превью изображений при переключении состояния формы формы */
+  var removePreviews = function () {
+    avatarPreview.src = 'img/muffin-grey.svg';
+    imagePreviewContainer.querySelectorAll('.ad-form__photo').forEach(function (item) {
+      item.remove();
+    });
+    imagePreviewContainer.appendChild(imagePreviewParent);
   };
 
   /* Проверяет валидность поля с заголовком объявления */
