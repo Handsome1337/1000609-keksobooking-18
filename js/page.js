@@ -13,7 +13,7 @@
       }, function () {
         window.message.showErrorMessage();
       });
-      window.form.changeFormStatus();
+      window.form.changeFormStatus(window.map.getMainPinPosition());
     }
   };
 
@@ -22,8 +22,22 @@
     window.map.changeMapStatus();
     window.filter.changeFiltersStatus(true);
     window.map.setMainPinDefaultCoordinates();
-    window.form.changeFormStatus();
+    window.form.changeFormStatus(window.map.getMainPinPosition());
   };
+
+  /* Устраняет дребезг при отправке формы, выводит сообщение об успешной отправке формы либо об ошибке */
+  var debounceSubmitCallback = window.util.debounce(function (form) {
+    window.server.upload(new FormData(form), function () {
+      deactivatePage();
+      window.message.showSuccessMessage();
+    }, function () {
+      window.card.removeCard();
+      window.message.showErrorMessage();
+    });
+  });
+
+  /* Заполняет поле адреса координатами метки сразу при загрузке страницы */
+  window.form.fillAddressInput(window.map.getMainPinPosition());
 
   /* Устанавливает обработчики событий главной метки */
   window.map.setMainPinHandlers(activatePage, window.form.fillAddressInput);
@@ -34,11 +48,5 @@
   });
 
   /* Обрабатывает отправку формы */
-  window.form.setSubmitCallbacks(function () {
-    deactivatePage();
-    window.message.showSuccessMessage();
-  }, function () {
-    window.card.removeCard();
-    window.message.showErrorMessage();
-  });
+  window.form.setSubmitCallback(debounceSubmitCallback);
 })();

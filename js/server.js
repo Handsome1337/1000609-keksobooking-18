@@ -8,7 +8,7 @@
   var createXhr = function (method, url, onSuccess, onError, data) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
-    xhr.timeout = TIMEOUT_DURATION; // 10s
+    xhr.timeout = TIMEOUT_DURATION;
 
     xhr.open(method, url);
     if (data) {

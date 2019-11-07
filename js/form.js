@@ -1,6 +1,14 @@
 'use strict';
 
 (function () {
+  var IMAGE_TYPES = ['gif', 'jpg', 'jpeg', 'png', 'svg', 'webp'];
+
+  /* Размеры превью фотографий жилья в форме объявления пользователя*/
+  var PhotoSize = {
+    WIDTH: 70,
+    HEIGHT: 70
+  };
+
   /* Находит форму объявления и кнопки отправки и сброса формы */
   var form = document.querySelector('.ad-form');
   var formSubmit = form.querySelector('.ad-form__submit');
@@ -17,6 +25,11 @@
   var typeOfHouseSelect = form.querySelector('#type');
   var timeInSelect = form.querySelector('#timein');
   var timeOutSelect = form.querySelector('#timeout');
+  var avatarChooser = form.querySelector('#avatar');
+  var imageChooser = form.querySelector('#images');
+  var avatarPreview = form.querySelector('img');
+  var imagePreviewContainer = form.querySelector('.ad-form__photo-container');
+  var imagePreviewParent = imagePreviewContainer.querySelector('.ad-form__photo');
 
   /* Сопоставляет количество комнат с количеством гостей */
   var matchRoomsAndGuests = function () {
@@ -55,15 +68,18 @@
   };
 
   /* Переключает активное и неактивное состояние формы */
-  var changeFormStatus = function () {
+  var changeFormStatus = function (callback) {
     form.classList.toggle('ad-form--disabled');
     if (!form.classList.contains('ad-form--disabled')) {
       window.util.changeDisabledAttr(formDisabledElements, false);
+      readImageFile(avatarChooser, avatarPreview);
+      readImageFile(imageChooser, imagePreviewContainer);
     } else {
       window.util.changeDisabledAttr(formDisabledElements, true);
       form.reset();
+      removePreviews();
     }
-    fillAddressInput(window.map.getMainPinPosition());
+    fillAddressInput(callback);
   };
 
   /* Изменяет цену за ночь в атрибутах placeholder и min в соответствии с типом жилья */
@@ -80,6 +96,51 @@
     } else {
       timeInSelect.value = timeOutSelect.value;
     }
+  };
+
+  /* Добавляет картинку пользователя или фотографию жилья при загрузке в chooser в блок preview */
+  var readImageFile = function (chooser, preview) {
+
+    chooser.addEventListener('change', function () {
+      if (preview.tagName !== 'IMG') {
+        var previewContainer = preview;
+        imagePreviewParent.remove();
+      }
+
+      Array.from(chooser.files).forEach(function (file) {
+        var fileName = file.name.toLowerCase();
+        var matches = IMAGE_TYPES.some(function (type) {
+          return fileName.endsWith(type);
+        });
+
+        if (matches) {
+          var reader = new FileReader();
+
+          reader.addEventListener('load', function (event) {
+            if (previewContainer) {
+              var previewParent = window.util.createElem('div', 'ad-form__photo');
+              var previewPhoto = window.util.createImg('img/muffin-grey.svg', PhotoSize.WIDTH, PhotoSize.HEIGHT, 'Фотография жилья');
+              previewPhoto.src = event.target.result;
+              previewParent.appendChild(previewPhoto);
+              previewContainer.appendChild(previewParent);
+            } else {
+              preview.src = reader.result;
+            }
+          });
+          reader.readAsDataURL(file);
+
+        }
+      });
+    });
+  };
+
+  /* Удаляет превью изображений при переключении состояния формы формы */
+  var removePreviews = function () {
+    avatarPreview.src = 'img/muffin-grey.svg';
+    imagePreviewContainer.querySelectorAll('.ad-form__photo').forEach(function (item) {
+      item.remove();
+    });
+    imagePreviewContainer.appendChild(imagePreviewParent);
   };
 
   /* Проверяет валидность поля с заголовком объявления */
@@ -101,9 +162,9 @@
     высокой вероятностью не изменится, изменится количество гостей */
   });
 
-  var setSubmitCallbacks = function (successSubmitCallback, errorSubmitCallback) {
+  var setSubmitCallback = function (submitCallback) {
     form.addEventListener('submit', function (evt) {
-      window.server.upload(new FormData(form), successSubmitCallback, errorSubmitCallback);
+      submitCallback(form);
       evt.preventDefault();
     });
   };
@@ -115,7 +176,6 @@
     });
   };
 
-  fillAddressInput(window.map.getMainPinPosition());
   typeOfHouseSelect.addEventListener('change', onTypeSelectChange);
   timeInSelect.addEventListener('change', onTimeSelectChange);
   timeOutSelect.addEventListener('change', onTimeSelectChange);
@@ -123,7 +183,7 @@
   window.form = {
     changeFormStatus: changeFormStatus,
     fillAddressInput: fillAddressInput,
-    setSubmitCallbacks: setSubmitCallbacks,
+    setSubmitCallback: setSubmitCallback,
     setResetCallback: setResetCallback
   };
 })();
