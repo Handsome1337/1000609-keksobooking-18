@@ -8,25 +8,6 @@
     ESC: 27
   };
 
-  /* Функция генерации случайного числа */
-  var getRandomInt = function (min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  };
-
-  /* Функция выбора случайного элемента массива */
-  var getRandomArrElem = function (arr) {
-    var rand = getRandomInt(0, arr.length - 1);
-    return arr[rand];
-  };
-
-  /* Функция перетасовки массива */
-  var getShuffledArr = function (arr) {
-    var shuffledArr = arr.slice().sort(function () {
-      return 0.5 - Math.random();
-    });
-    return shuffledArr;
-  };
-
   /* Создает новый элемент с заданным атрибутом class */
   var createElem = function (elemName, elemClass) {
     var newElement = document.createElement(elemName);
@@ -83,11 +64,6 @@
   };
 
   window.util = {
-    ENTER_KEYCODE: KeyCode.ENTER,
-    ESC_KEYCODE: KeyCode.ESC,
-    getRandomInt: getRandomInt,
-    getRandomArrElem: getRandomArrElem,
-    getShuffledArr: getShuffledArr,
     createElem: createElem,
     createImg: createImg,
     changeDisabledAttr: changeDisabledAttr,

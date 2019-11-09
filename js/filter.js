@@ -4,14 +4,6 @@
   /* Максимальное количество отображаемых меток */
   var MAX_PINS_QUANTITY = 5;
 
-  var filtersForm = document.querySelector('.map__filters');
-  var disabledFilters = filtersForm.querySelectorAll('[disabled]');
-  var housingType = filtersForm.querySelector('#housing-type');
-  var housingPrice = filtersForm.querySelector('#housing-price');
-  var housingRoom = filtersForm.querySelector('#housing-rooms');
-  var housingGuest = filtersForm.querySelector('#housing-guests');
-  var housingFeatures = Array.from(filtersForm.querySelectorAll('.map__checkbox'));
-
   /* Переходные цены в фильтре цены */
   var Price = {
     INFINITY: Infinity,
@@ -19,6 +11,14 @@
     MIDDLE: 10000,
     BOTTOM: 0
   };
+
+  var filtersForm = document.querySelector('.map__filters');
+  var disabledFilters = filtersForm.querySelectorAll('[disabled]');
+  var housingType = filtersForm.querySelector('#housing-type');
+  var housingPrice = filtersForm.querySelector('#housing-price');
+  var housingRoom = filtersForm.querySelector('#housing-rooms');
+  var housingGuest = filtersForm.querySelector('#housing-guests');
+  var housingFeatures = Array.from(filtersForm.querySelectorAll('.map__checkbox'));
 
   /* Активирует/деактивирует фильтры */
   var changeFiltersStatus = function (flag) {
@@ -91,7 +91,7 @@
   };
 
   window.filter = {
-    changeFiltersStatus: changeFiltersStatus,
-    setFilterOffersCallback: setFilterOffersCallback
+    changeStatus: changeFiltersStatus,
+    setOffersCallback: setFilterOffersCallback
   };
 })();

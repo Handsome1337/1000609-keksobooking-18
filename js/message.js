@@ -19,22 +19,14 @@
     main.insertBefore(message, main.firstChild);
     document.addEventListener('keydown', onMessageEscPress);
     /* Обработчик клика на произвольную область экрана за пределами блока с сообщением */
-    document.addEventListener('click', beyondMessageClick);
-  };
-
-  var showSuccessMessage = function () {
-    addMessage('success');
-  };
-
-  var showErrorMessage = function () {
-    addMessage();
+    document.addEventListener('click', onBeyondMessageClick);
   };
 
   /* Удаляет сообщение */
   var removeMessage = function () {
     message.remove();
     document.removeEventListener('keydown', onMessageEscPress);
-    document.removeEventListener('click', beyondMessageClick);
+    document.removeEventListener('click', onBeyondMessageClick);
   };
 
   var onErrorCloseClick = function () {
@@ -45,7 +37,7 @@
     window.util.isEscEvent(evt, removeMessage);
   };
 
-  var beyondMessageClick = function (evt) {
+  var onBeyondMessageClick = function (evt) {
     var typeOfMessage = message.className;
     var messageText = message.querySelector('.' + typeOfMessage + '__message');
     if (evt.target !== messageText) {
@@ -54,7 +46,11 @@
   };
 
   window.message = {
-    showSuccessMessage: showSuccessMessage,
-    showErrorMessage: showErrorMessage
+    showSuccess: function () {
+      addMessage('success');
+    },
+    showError: function () {
+      addMessage();
+    }
   };
 })();
