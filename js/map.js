@@ -1,51 +1,51 @@
 'use strict';
 
 (function () {
-  var MAIN_PIN_WIDTH = 62;
-  var MAIN_PIN_HEIGHT = 62;
-  var TAIL_OF_MAIN_PIN_HEIGHT = 22;
+  var MainPinSize = {
+    WIDTH: 62,
+    HEIGHT: 62,
+    TAIL_HEIGHT: 22
+  };
 
-  /* Переменная map вынесена в util.js, потому что она используется в нескольких модулях */
   var map = document.querySelector('.map');
   /* Ограничения перемещения главной метки по осям X и Y */
   var Limit = {
-    TOP: 130 - (MAIN_PIN_HEIGHT + TAIL_OF_MAIN_PIN_HEIGHT),
-    RIGHT: map.offsetWidth - MAIN_PIN_WIDTH / 2,
-    BOTTOM: 630 - (MAIN_PIN_HEIGHT + TAIL_OF_MAIN_PIN_HEIGHT),
-    LEFT: -MAIN_PIN_WIDTH / 2
+    TOP: 130 - (MainPinSize.HEIGHT + MainPinSize.TAIL_HEIGHT),
+    RIGHT: map.offsetWidth - MainPinSize.WIDTH / 2,
+    BOTTOM: 630 - (MainPinSize.HEIGHT + MainPinSize.TAIL_HEIGHT),
+    LEFT: -MainPinSize.WIDTH / 2
   };
   var pinMap = map.querySelector('.map__pins');
   /* Находит главную метку, взаимодействие с которой переводит страницу в активное состояние */
   var mainPin = map.querySelector('.map__pin--main');
-  /* Находит координаты главной метки по умолчанию */
-  var MainPinDefaultCoordinate = {
-    X: mainPin.style.left,
-    Y: mainPin.style.top
+  /* Создает объект с координатами x и y*/
+  var Coordinate = function (x, y) {
+    this.x = x;
+    this.y = y;
   };
+  /* Находит координаты главной метки по умолчанию */
+  var mainPinDefaultPosition = new Coordinate(mainPin.style.left, mainPin.style.top);
 
   /* Находит координаты главный метки */
-  var getMainPinPosition = function () {
-    var coordinates = {
-      'x': Math.round(mainPin.offsetLeft + MAIN_PIN_WIDTH / 2),
-      'y': Math.round(mainPin.offsetTop + MAIN_PIN_HEIGHT / 2)
-    };
+  var getMainPinCoordinates = function () {
+    var coordinates = new Coordinate(Math.round(mainPin.offsetLeft + MainPinSize.WIDTH / 2), Math.round(mainPin.offsetTop + MainPinSize.HEIGHT / 2));
     if (!map.classList.contains('map--faded')) {
-      coordinates.y = coordinates.y + MAIN_PIN_HEIGHT / 2 + TAIL_OF_MAIN_PIN_HEIGHT;
+      coordinates.y = coordinates.y + MainPinSize.HEIGHT / 2 + MainPinSize.TAIL_HEIGHT;
     }
     return coordinates;
   };
 
   /* Перемещает главную метку в позицию по умолчанию */
-  var setMainPinDefaultCoordinates = function () {
-    mainPin.style.top = MainPinDefaultCoordinate.Y;
-    mainPin.style.left = MainPinDefaultCoordinate.X;
+  var setMainPinDefaultPosition = function () {
+    mainPin.style.top = mainPinDefaultPosition.y;
+    mainPin.style.left = mainPinDefaultPosition.x;
   };
 
   /* Переключает активное и неактивное состояние карты */
   var changeMapStatus = function () {
     if (!map.classList.contains('map--faded')) {
       removePins();
-      window.card.removeCard();
+      window.card.remove();
     }
     map.classList.toggle('map--faded');
   };
@@ -58,11 +58,7 @@
   /* Проверяет наличие активной метки */
   var isThereActivePin = function () {
     var activePin = map.querySelector('.map__pin--active');
-    if (activePin) {
-      return activePin;
-    } else {
-      return false;
-    }
+    return activePin ? activePin : false;
   };
 
   /* Отрисовывает метки на основе полученных объявлений */
@@ -72,31 +68,29 @@
     var fragment = document.createDocumentFragment();
 
     arr.forEach(function (item) {
-      if ('offer' in item) {
-        var pinElement = window.pin(item);
+      var pin = window.pin(item);
 
-        pinElement.addEventListener('click', function () {
-          /* Находит карточку объявления */
-          var card = map.querySelector('.map__card');
-          /* Находит активную метку */
-          var activePin = isThereActivePin();
-          /* Деактивирует метку, которую ранее активировал пользователь, если такая была */
-          if (activePin) {
-            activePin.classList.remove('map__pin--active');
-          }
-          /* Активирует метку */
-          pinElement.classList.add('map__pin--active');
-          /* Если ранее была открыта какая-либо карточка, удаляет её */
-          if (card) {
-            card.remove();
-          }
-          card = addCard(window.card.createCard(item, function () {
-            pinElement.classList.remove('map__pin--active');
-          }));
-        });
+      pin.addEventListener('click', function () {
+        /* Находит карточку объявления */
+        var card = map.querySelector('.map__card');
+        /* Находит активную метку */
+        var activePin = isThereActivePin();
+        /* Деактивирует метку, которую ранее активировал пользователь, если такая была */
+        if (activePin) {
+          activePin.classList.remove('map__pin--active');
+        }
+        /* Активирует метку */
+        pin.classList.add('map__pin--active');
+        /* Если ранее была открыта какая-либо карточка, удаляет её */
+        if (card) {
+          card.remove();
+        }
+        card = addCard(window.card.create(item, function () {
+          pin.classList.remove('map__pin--active');
+        }));
+      });
 
-        fragment.appendChild(pinElement);
-      }
+      fragment.appendChild(pin);
     });
 
     pinMap.appendChild(fragment);
@@ -119,23 +113,14 @@
 
   /* Перемещает главную метку по карте */
   var movePin = function (evt, callback) {
-    var startCoordinates = {
-      x: evt.clientX,
-      y: evt.clientY
-    };
+    var startCoordinates = new Coordinate(evt.clientX, evt.clientY);
 
     var onMouseMove = function (moveEvt) {
       moveEvt.preventDefault();
 
-      var offset = {
-        x: startCoordinates.x - moveEvt.clientX,
-        y: startCoordinates.y - moveEvt.clientY
-      };
+      var offset = new Coordinate(startCoordinates.x - moveEvt.clientX, startCoordinates.y - moveEvt.clientY);
 
-      startCoordinates = {
-        x: moveEvt.clientX,
-        y: moveEvt.clientY
-      };
+      startCoordinates = new Coordinate(moveEvt.clientX, moveEvt.clientY);
 
       if (mainPin.offsetTop - offset.y >= Limit.TOP && mainPin.offsetTop - offset.y <= Limit.BOTTOM) {
         mainPin.style.top = mainPin.offsetTop - offset.y + 'px';
@@ -144,7 +129,7 @@
         mainPin.style.left = mainPin.offsetLeft - offset.x + 'px';
       }
 
-      callback(getMainPinPosition());
+      callback(getMainPinCoordinates());
     };
 
     var onMouseUp = function (upEvt) {
@@ -170,13 +155,11 @@
   };
 
   window.map = {
-    getMainPinPosition: getMainPinPosition,
-    setMainPinDefaultCoordinates: setMainPinDefaultCoordinates,
-    changeMapStatus: changeMapStatus,
-    isMapActive: isMapActive,
-    isThereActivePin: isThereActivePin,
-    fillMap: fillMap,
-    removePins: removePins,
+    getMainPinCoordinates: getMainPinCoordinates,
+    setMainPinDefaultPosition: setMainPinDefaultPosition,
+    changeStatus: changeMapStatus,
+    isActive: isMapActive,
+    fill: fillMap,
     setMainPinHandlers: setMainPinHandlers
   };
 })();
