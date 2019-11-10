@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  var SUCCESS = 'success';
+
   /* Находит блок main и шаблоны блоков с сообщениями об успешной отправке и ошибке */
   var main = document.querySelector('main');
   var defaultSuccess = document.querySelector('#success').content.querySelector('.success');
@@ -9,7 +11,7 @@
 
   /* Добавляет сообщение в разметку */
   var addMessage = function (type) {
-    if (type === 'success') {
+    if (type === SUCCESS) {
       message = defaultSuccess.cloneNode(true);
     } else {
       message = defaultError.cloneNode(true);

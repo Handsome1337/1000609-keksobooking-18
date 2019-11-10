@@ -68,7 +68,7 @@
     var fragment = document.createDocumentFragment();
 
     arr.forEach(function (item) {
-      var pin = window.pin(item);
+      var pin = window.createPin(item);
 
       pin.addEventListener('click', function () {
         /* Находит карточку объявления */
@@ -85,6 +85,7 @@
         if (card) {
           card.remove();
         }
+        /* Когда открытых карточек точно нет, присваивает переменной card новую карточку */
         card = addCard(window.card.create(item, function () {
           pin.classList.remove('map__pin--active');
         }));
